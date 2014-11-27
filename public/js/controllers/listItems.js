@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc function
- * @name maClefUsbApp.controller:MainCtrl
+ * @name maClefUsbApp.controller:ListItemsCtrl
  * @description
- * # MainCtrl
+ * # ListItemsCtrl
  * Controller of the maClefUsbApp
  */
 angular.module('maClefUsbApp')
-  .controller('MainCtrl', function ($scope) {
+  .controller('ListItemsCtrl', function ($scope) {
 
     // see
     // http://html5demos.com/dnd-upload#view-source

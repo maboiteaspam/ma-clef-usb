@@ -42,6 +42,25 @@ var maClefUsb = (function(storagePath){
         });
       });
     },
+    rename: function(oldPath, newPath, done){
+      done({
+        oldPath: oldPath,
+        newPath: newPath,
+        fileName: '',
+        path: '',
+        size: '',
+        mtime: ''
+      });
+    },
+    read: function(filePath, done){
+      done({
+        filePath: filePath,
+        fileName: '',
+        path: '',
+        size: '',
+        mtime: ''
+      });
+    },
     remove: function(filePath, done){
       done(true);
     }

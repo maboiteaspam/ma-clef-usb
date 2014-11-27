@@ -1,4 +1,38 @@
-body { padding-top: 70px; }
+body {
+    padding-top: 70px;
+    padding-bottom: 50px;
+}
+.logo i {
+    font-size: 75%;
+    margin-top: .40em;
+    margin-right: .40em;
+    color: rgb(82, 143, 181);
+}
 .search-box {
     margin-top: .40em;
+}
+.add-items{
+}
+.add-items i {
+    font-size: 75%;
+    margin-top: .40em;
+    margin-right: .40em;
+}
+.add-items .dropdown-toggle{
+    font-size: 36%;
+}
+.list-items{
+    margin-bottom: 0;
+}
+.list-items i{
+    cursor: pointer;
+}
+.list-items i.glyphicon-download{
+    color: rgb(37, 194, 45);
+}
+.list-items i.glyphicon-remove{
+    color: rgb(215, 90, 53);
+}
+.footer .text-center{
+    margin-top: 0.8em;
 }
