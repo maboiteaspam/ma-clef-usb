@@ -1,0 +1,37 @@
+
+@font-face {
+    font-family: mavenpro;
+    src: url(maven-pro-light-200.otf);
+}
+
+@font-face {
+    font-family: signika;
+    src: url(source-sans-pro.ttf);
+}
+
+body {
+    font-family: mavenpro;
+    padding: 20px;
+}
+
+h1 {
+    margin-top: 0;
+    font-weight: normal;
+    font-size: 36px;
+}
+h2 {
+    font-weight: normal;
+    margin-top: 60px;
+}
+
+a {
+    font-weight: bold;
+    Text-decoration: none;
+    color: black;
+}
+a:hover {
+    color: orange;
+}
+a:visited {
+    color: black;
+}
