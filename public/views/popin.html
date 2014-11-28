@@ -1,0 +1,19 @@
+
+<div class="bg"
+     ng-click="$root.$broadcast('hidePopin')"></div>
+
+<div ng-include="'views/help.html'"
+     ng-class="{visible: name=='help'}"
+     class="help"></div>
+
+<div ng-include="'views/about.html'"
+     ng-class="{visible: name=='about'}"
+     class="about"></div>
+
+<div ng-include="'views/addFile.html'"
+     ng-class="{visible: name=='addFile'}"
+     class="addFile"></div>
+
+<div ng-include="'views/addFolder.html'"
+     ng-class="{visible: name=='addFolder'}"
+     class="addFolder"></div>

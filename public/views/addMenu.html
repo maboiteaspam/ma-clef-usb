@@ -1,0 +1,21 @@
+
+<button class="btn btn-default dropdown-toggle"
+        type="button"
+        data-toggle="dropdown"
+        aria-expanded="true">
+    <i class="glyphicon glyphicon-plus"></i>
+</button>
+<ul class="dropdown-menu pull-left" role="menu" aria-labelledby="dropdownMenu1">
+    <li role="presentation"
+        ng-click="$root.$broadcast('showPopin', 'addFile')">
+        <a role="menuitem" tabindex="-1" href="#">
+            <i class="glyphicon glyphicon-file"></i>Add file
+        </a>
+    </li>
+    <li role="presentation"
+        ng-click="$root.$broadcast('showPopin', 'addFolder')">
+        <a role="menuitem" tabindex="-1" href="#">
+            <i class="glyphicon glyphicon-folder-close"></i>Add folder
+        </a>
+    </li>
+</ul>
