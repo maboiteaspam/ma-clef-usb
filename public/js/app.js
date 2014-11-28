@@ -13,4 +13,5 @@ angular
         'angularMoment',
         'angular-underscore'
     ])
+
 ;

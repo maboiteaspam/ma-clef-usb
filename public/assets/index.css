@@ -31,6 +31,9 @@ body {
 .list-items{
     margin-bottom: 0;
 }
+.list-items td.size{
+    cursor: default;
+}
 .list-items i{
     cursor: pointer;
 }
@@ -76,6 +79,7 @@ body {
 }
 .about,
 .help,
+.wontBrowse,
 .addFile,
 .addFolder{
     width: 80%;
@@ -88,6 +92,7 @@ body {
 .about .close,
 .help .close,
 .addFile .close,
+.wontBrowse .close,
 .addFolder .close{
     position: absolute;
     top: 10px;
@@ -95,8 +100,15 @@ body {
 }
 .about.visible,
 .help.visible,
+.wontBrowse.visible,
 .addFile.visible,
 .addFolder.visible{
     display: inline-block;
-    box-shadow: -10px 10px 50px #555;
+}
+.about.visible .panel,
+.help.visible .panel,
+.wontBrowse.visible .panel,
+.addFile.visible .panel,
+.addFolder.visible .panel{
+    box-shadow: -10px 10px 50px rgba(85, 85, 85, .5);
 }

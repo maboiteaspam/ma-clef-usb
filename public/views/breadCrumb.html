@@ -1,8 +1,12 @@
 
 <ol class="breadcrumb">
-    <li><a href="#">Home</a></li>
-    <li><a href="#">Library</a></li>
-    <li class="active">Data</li>
+
+    <li ng-repeat="item in breadcrumb">
+        <a href="#{{item.path}}"
+           ng-class="{active:item.active}"
+           ng-click="$root.$broadcast('changePath', item)"
+                >{{item.name}}</a>
+    </li>
 
     <div ng-include="'views/addMenu.html'"
          class=" pull-right dropdown add-items"></div>

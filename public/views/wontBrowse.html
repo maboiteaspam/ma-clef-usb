@@ -1,0 +1,13 @@
+
+<div class="panel panel-default panel-warning">
+    <div class="panel-heading">Can t browse !</div>
+    <div class="panel-body">
+        It won t browse <span>{{item.path}}</span>
+    </div>
+
+    <button type="button" class="close"
+            ng-click="$root.$broadcast('hidePopin')">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+    </button>
+</div>
