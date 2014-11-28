@@ -30,6 +30,8 @@
     "connect-busboy": "0.0.2",
     "express": "^4.8.2",
     "fs-extra": "0.10.0",
+    "glob": "^4.2.1",
+    "mime": "^1.2.11",
     "mkdirp": "0.5.0",
     "morgan": "1.2.2",
     "path-extra": "0.2.1",
