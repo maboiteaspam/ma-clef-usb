@@ -1,6 +1,6 @@
 {
   "name": "ma-clef-usb",
-  "description": "Ma clef Usb, a webapp on top of cozy-light PAAS to trasnfer files between computers, what we use to do with usb  stick in old times !",
+  "description": "Ma clef Usb, a webapp on top of cozy-light PAAS to transfer files between computers, what we use to do with usb  stick in old times !",
   "version": "0.0.0",
   "author": "maboiteaspam",
   "licenses": [
