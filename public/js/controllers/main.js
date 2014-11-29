@@ -55,6 +55,23 @@ angular.module('maClefUsbApp')
     $rootScope.$on('pathChanged', function(ev, item){
       update_breadcrumb(item.path);
     });
+    $rootScope.$on('createFolder',function(ev, name){
+      $root.$broadcast('hidePopin')
+      //$.post("add-dir",{itemPath:name},function(item){
+      //  $scope.$apply(function(){
+      //    if( item == 'err'
+      //      || item == 'not-found' ){
+      //      $rootScope.$broadcast('showPopin', 'wontBrowse');
+      //      update_breadcrumb(current_path);
+      //    } else {
+      //      if( item.type == 'file' ){
+      //        change_item({path:item.path.replace(item.name,'')});
+      //      }
+      //      change_item(item);
+      //    }
+      //  });
+      //});
+    });
 
     var current_path = "/";
     if( window.location.hash ){
