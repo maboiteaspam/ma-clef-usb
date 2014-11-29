@@ -42,20 +42,37 @@ angular.module('maClefUsbApp')
             $rootScope.$broadcast('pathChanged', item, items);
           }
         });
-      })
+      });
     };
 
     $rootScope.$on('changePath', function(ev,item){
-      change_item(item);
+      if( item.type != 'file' ){
+        change_item(item);
+      } else {
+        $rootScope.$broadcast('previewPath', item);
+      }
     });
-    $rootScope.$on('pathChanged', function(ev, item, items){
+    $rootScope.$on('pathChanged', function(ev, item){
       update_breadcrumb(item.path);
     });
 
     var current_path = "/";
     if( window.location.hash ){
       current_path = window.location.hash.match(/#(.+)/)[1];
+      current_path = decodeURI(current_path);
     }
-    change_item({path:current_path})
-
+    $.post("readmeta",{itemPath:current_path},function(item){
+      $scope.$apply(function(){
+        if( item == 'err'
+          || item == 'not-found' ){
+          $rootScope.$broadcast('showPopin', 'wontBrowse');
+          update_breadcrumb(current_path);
+        } else {
+          if( item.type == 'file' ){
+            change_item({path:item.path.replace(item.name,'')});
+          }
+          change_item(item);
+        }
+      });
+    });
   }]);

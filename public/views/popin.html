@@ -1,23 +1,32 @@
 
-<div class="bg"
+<div class="popin-bg"
      ng-click="$root.$broadcast('hidePopin')"></div>
 
-<div ng-include="'views/help.html'"
+<div ng-include="'views/popins/help.html'"
      ng-class="{visible: name=='help'}"
-     class="help"></div>
+     class="help popin-body"></div>
 
-<div ng-include="'views/about.html'"
+<div ng-include="'views/popins/about.html'"
      ng-class="{visible: name=='about'}"
-     class="about"></div>
+     class="about popin-body"></div>
 
-<div ng-include="'views/addFile.html'"
+<div ng-include="'views/popins/addNote.html'"
+     ng-class="{visible: name=='addNote'}"
+     class="addFile popin-body"></div>
+
+<div ng-include="'views/popins/addFile.html'"
      ng-class="{visible: name=='addFile'}"
-     class="addFile"></div>
+     class="addFile popin-body"></div>
 
-<div ng-include="'views/addFolder.html'"
+<div ng-include="'views/popins/addFolder.html'"
      ng-class="{visible: name=='addFolder'}"
-     class="addFolder"></div>
+     class="addFolder popin-body"></div>
 
-<div ng-include="'views/wontBrowse.html'"
+<div ng-include="'views/popins/wontBrowse.html'"
      ng-class="{visible: name=='wontBrowse'}"
-     class="wontBrowse"></div>
+     class="wontBrowse popin-body"></div>
+
+<div ng-include="'views/popins/previewFile.html'"
+     ng-controller="PreviewFileCtrl"
+     ng-class="{visible: name=='previewFile'}"
+     class="previewFile popin-body"></div>

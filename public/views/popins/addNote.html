@@ -8,6 +8,7 @@
                 <div class="col-sm-10">
                     <input type="text"
                            class="form-control"
+                           pattern="[^/\\]"
                            placeholder="Name">
                 </div>
             </div>
@@ -25,11 +26,11 @@
                 </div>
             </div>
         </form>
-
-        <button type="button" class="close"
-                ng-click="$root.$broadcast('hidePopin')">
-            <span aria-hidden="true">&times;</span>
-            <span class="sr-only">Close</span>
-        </button>
     </div>
+
+    <button type="button" class="close"
+            ng-click="$root.$broadcast('hidePopin')">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+    </button>
 </div>

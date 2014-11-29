@@ -1,0 +1,30 @@
+<div class="panel panel-default" ng-if="item">
+    <div class="panel-heading">Preview {{item.name}}</div>
+    <div class="panel-body">
+        {{item.name}}
+        {{item.contentType}}
+        {{item.size}}
+        <audio controls ng-if="getMediaType()=='sound'">
+            <source src="readfile/{{item.path}}"
+                    type="{{item.contentType}}">
+            Your browser does not support the audio element.
+        </audio>
+        <video controls ng-if="getMediaType()=='video'">
+            <source src="readfile/{{item.path}}"
+                    type="{{item.contentType}}">
+            Your browser does not support the video element.
+        </video>
+        <img src="readfile/{{item.path}}"
+             alt="{{item.nme}}"
+             ng-if="getMediaType()=='picture'" />
+
+        <iframe ng-if="getMediaType()=='text'"
+                src="readfile/{{item.path}}"></iframe>
+    </div>
+
+    <button type="button" class="close"
+            ng-click="$root.$broadcast('hidePopin')">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+    </button>
+</div>

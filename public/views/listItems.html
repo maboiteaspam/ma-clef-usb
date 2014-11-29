@@ -13,9 +13,15 @@
                 >{{item.name}}</a>
         </td>
         <td class="size">{{item.size}}</td>
-        <td><i class="glyphicon glyphicon-download"
-               ng-class="{visible:item.readable}"></i></td>
-        <td><i class="glyphicon glyphicon-remove"
-               ng-class="{visible:item.writable}"></i></td>
+        <td>
+            <a href="download/{{item.path}}"
+               target="_blank"
+               ng-class="{hidden:item.type!='file'}">
+                <i class="glyphicon glyphicon-download"></i>
+            </a>
+        </td>
+        <td>
+            <i class="glyphicon glyphicon-remove"></i>
+        </td>
     </tr>
 </table>

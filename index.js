@@ -45,29 +45,16 @@ var maClefUsb = (function(){
         done('not-found');
       }
     },
-    readfile: function(dirPath, done){
-      dirPath = pathExtra.normalize(dirPath);
-      var rPath = pathExtra.resolve(storagePath, dirPath);
+    readfile: function(filePath, done){
+      filePath = pathExtra.normalize(filePath);
+      var rPath = pathExtra.join(storagePath, filePath);
+      rPath = pathExtra.resolve(storagePath, rPath);
       if( rPath.match(new RegExp("^"+storagePath)) ){
-        glob("/*", {cwd:rPath}, function (er, files) {
-          var items = [];
-          files.forEach(function(file){
-            var filePath = pathExtra.join(filePath, file);
-            var stat = fs.lstatSync(filePath);
-            items.push({
-              type: stat.isFile()?'file':'folder',
-              path: filePath,
-              name: file,
-              ext: pathExtra.extname(file),
-              size: stat.size,
-              mtime: stat.mtime
-            })
-          });
-          done(items);
-        });
-      }else{
-        done('not-found');
+        if( fs.existsSync(rPath) ){
+          return done(null,fs.createReadStream(rPath));
+        }
       }
+      done('not-found');
     },
     readdir: function(dirPath, done){
       dirPath = pathExtra.normalize(dirPath);
@@ -85,6 +72,7 @@ var maClefUsb = (function(){
               name: file,
               ext: pathExtra.extname(file),
               size: stat.size,
+              contentType: mime.lookup(filePath),
               mtime: stat.mtime
             })
           });
@@ -93,6 +81,27 @@ var maClefUsb = (function(){
       }else{
         done('not-found');
       }
+    },
+    readmeta: function(itemPath, done){
+      itemPath = pathExtra.normalize(itemPath);
+      var rPath = pathExtra.join(storagePath, itemPath);
+      rPath = pathExtra.resolve(storagePath, rPath);
+      if( rPath.match(new RegExp("^"+storagePath)) ){
+        if( fs.existsSync(rPath) ){
+          var stat = fs.lstatSync( rPath );
+          var meta = {
+            type: stat.isFile()?'file':'folder',
+            path: '/'+pathExtra.relative(storagePath, rPath),
+            name: pathExtra.basename(rPath),
+            ext: pathExtra.extname(rPath),
+            size: stat.size,
+            contentType: mime.lookup(rPath),
+            mtime: stat.mtime
+          };
+          return done(meta);
+        }
+      }
+      done('not-found');
     },
     remove: function(filePath, done){
       filePath = pathExtra.normalize(filePath);
@@ -137,15 +146,49 @@ var start = function(options, done) {
       res.send( list );
     });
   });
-  app.post('/readfile', function(req, res){
-    var filePath = req.body.filePath;
-    maClefUsb.readfile(filePath,function(err, stream){
-      var type = mime.lookup(filePath);
-      if (!res.getHeader('content-type')) {
-        var charset = mime.charsets.lookup(type);
-        res.setHeader('Content-Type', type + (charset ? '; charset=' + charset : ''));
+  app.get(/\/readfile\/(.+)/, function(req, res){
+    var filePath = req.params[0];
+    maClefUsb.readmeta(filePath,function(item){
+      if( item == 'not-found' ){
+        res.status(404).send()
+      }else if(item.type!='file'){
+        res.status(300).send()
+      }else{
+        var type = item.contentType;
+        if (!res.getHeader('content-type')) {
+          var charset = mime.charsets.lookup(type);
+          res.setHeader('Content-Type', type + (charset ? '; charset=' + charset : ''));
+        }
+        maClefUsb.readfile(filePath,function(err, stream){
+          stream.pipe(res);
+        });
       }
-      stream.pipe(res);
+    });
+  });
+  app.get(/\/download\/(.+)/, function(req, res){
+    var filePath = req.params[0];
+    maClefUsb.readmeta(filePath,function(item){
+      if( item == 'not-found' ){
+        res.status(404).send()
+      }else if(item.type!='file'){
+        res.status(300).send()
+      }else{
+        res.setHeader('Content-disposition', 'attachment; filename=' + item.name);
+        var type = item.contentType;
+        if (!res.getHeader('content-type')) {
+          var charset = mime.charsets.lookup(type);
+          res.setHeader('Content-Type', type + (charset ? '; charset=' + charset : ''));
+        }
+        maClefUsb.readfile(filePath,function(err, stream){
+          stream.pipe(res);
+        });
+      }
+    });
+  });
+  app.post('/readmeta', function(req, res){
+    var itemPath = req.body.itemPath;
+    maClefUsb.readmeta(itemPath,function(list){
+      res.send( list );
     });
   });
   app.post('/rename', function(req, res){
