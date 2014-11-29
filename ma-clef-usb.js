@@ -60,7 +60,7 @@ var api = {
           var stat = fs.lstatSync( filePath );
           items.push({
             type: stat.isFile()?'file':'folder',
-            path: '/'+ pathExtra.relative(storagePath, rstoreFilePath)+''+file,
+            path: pathExtra.join('/',pathExtra.relative(storagePath, rstoreFilePath),file),
             name: file,
             ext: pathExtra.extname(file),
             size: stat.size,
@@ -80,7 +80,7 @@ var api = {
       var stat = fs.lstatSync( itemPath );
       return done({
         type: stat.isFile()?'file':'folder',
-        path: '/'+pathExtra.relative(storagePath, itemPath),
+        path: pathExtra.join('/',pathExtra.relative(storagePath, itemPath)),
         name: pathExtra.basename(itemPath),
         ext: pathExtra.extname(itemPath),
         size: stat.size,
