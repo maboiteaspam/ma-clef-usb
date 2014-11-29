@@ -18,46 +18,19 @@ angular.module('maClefUsbApp')
       path:'/',
       name:'home',
       ext:'',
-      size:'',
-      readable:true,
-      writable:true
+      size:''
     };
-    $scope.items = [
-      {
-        type:'file',
-        path:'/photos de vacances phuket 2014.jpeg',
-        name:'photos de vacances phuket 2014.jpeg',
-        ext:'jpeg',
-        size:'569.2 Kb',
-        readable:true,
-        writable:true
-      },
-      {
-        type:'file',
-        path:'/file2.jpeg',
-        name:'file2.jpeg',
-        ext:'jpeg',
-        size:'25.2kb',
-        readable:true,
-        writable:true
-      },
-      {
-        type:'folder',
-        path:'/Nouveau folder',
-        name:'Nouveau folder',
-        ext:'',
-        size:'',
-        readable:true,
-        writable:true
-      }
-    ];
-    $scope.items = $filter('orderBy')($scope.items, ['-type','name']);
+    $scope.items = [];
+    var set_items = function(items){
+      $scope.items = $filter('orderBy')(items, ['-type','name']);
+    };
     $rootScope.$on('changePath', function(ev,item){
+    });
+    $rootScope.$on('pathChanged', function(ev, item, items){
       $scope.item = item;
-      if( !$scope.item.readable ){
-        $rootScope.$broadcast('showPopin', 'wontBrowse');
-      }else{
-
+      if( item.type == 'file' ){
+      } else {
+        set_items(items);
       }
     });
 
