@@ -9,59 +9,58 @@ var storagePath = '';
 
 var relativePath = function(p){
   var p = pathExtra.normalize(p);
-  p = pathExtra.resolve(storagePath, p);
+  p = pathExtra.join(storagePath, p);
   return p;
 };
 
 var api = {
   write: function(storePath, fileName, file, done){
-    var rstoreFilePath = relativePath( pathExtra.join(storePath, fileName) );
-    if( rstoreFilePath.match(new RegExp("^"+storagePath)) ){
+    var astorePath = relativePath(storePath);
+    if( fs.existsSync(astorePath) ){
+      var rstoreFilePath = relativePath( pathExtra.join(storePath, fileName) );
       var fstream = fs.createWriteStream( rstoreFilePath );
       file.pipe(fstream);
-      fstream.on('close', function () {
+      file.on('readable', function() {
+        var chunk;
+        while (null !== (chunk = file.read())) {
+        }
+      });
+      file.on('close', function () {
         api.readdir(storePath, done);
       });
     }else{
-      done('not-found');
+      done("not-found")
     }
   },
   rename: function(oldPath, newPath, done){
-    newPath = pathExtra.normalize(newPath);
-    oldPath = pathExtra.normalize(oldPath);
-    var roldPath = pathExtra.resolve(storagePath, oldPath);
-    var rnewPath = pathExtra.resolve(storagePath, newPath);
-    if( roldPath.match(new RegExp("^"+storagePath))
-      && rnewPath.match(new RegExp("^"+storagePath)) ){
+    var roldPath = relativePath( oldPath );
+    var rnewPath = relativePath( newPath );
+    if( fs.existsSync(rnewPath) ){
+      done('file-exists');
+    }else if( fs.existsSync(roldPath) ){
       fs.rename(roldPath, rnewPath, done);
     }else{
       done('not-found');
     }
   },
   readfile: function(filePath, done){
-    filePath = pathExtra.normalize(filePath);
-    var rPath = pathExtra.join(storagePath, filePath);
-    rPath = pathExtra.resolve(storagePath, rPath);
-    if( rPath.match(new RegExp("^"+storagePath)) ){
-      if( fs.existsSync(rPath) ){
-        return done(null,fs.createReadStream(rPath));
-      }
+    filePath = relativePath( filePath );
+    if( fs.existsSync(filePath) ){
+      return done(null,fs.createReadStream(filePath));
     }
     done('not-found');
   },
   readdir: function(dirPath, done){
-    dirPath = pathExtra.normalize(dirPath);
-    var rPath = pathExtra.join(storagePath, dirPath);
-    rPath = pathExtra.resolve(storagePath, rPath);
-    if( rPath.match(new RegExp("^"+storagePath)) ){
-      glob("*", {cwd:rPath}, function (er, files) {
+    var rstoreFilePath = relativePath( dirPath );
+    if( fs.existsSync(rstoreFilePath) ){
+      glob("*", {cwd:rstoreFilePath}, function (er, files) {
         var items = [];
         files.forEach(function(file){
-          var filePath = pathExtra.join(rPath, file);
+          var filePath = pathExtra.join(rstoreFilePath, file);
           var stat = fs.lstatSync( filePath );
           items.push({
             type: stat.isFile()?'file':'folder',
-            path: '/'+pathExtra.relative(storagePath, filePath),
+            path: '/'+ pathExtra.relative(storagePath, rstoreFilePath)+''+file,
             name: file,
             ext: pathExtra.extname(file),
             size: stat.size,
@@ -76,42 +75,34 @@ var api = {
     }
   },
   readmeta: function(itemPath, done){
-    itemPath = pathExtra.normalize(itemPath);
-    var rPath = pathExtra.join(storagePath, itemPath);
-    rPath = pathExtra.resolve(storagePath, rPath);
-    if( rPath.match(new RegExp("^"+storagePath)) ){
-      if( fs.existsSync(rPath) ){
-        var stat = fs.lstatSync( rPath );
-        var meta = {
-          type: stat.isFile()?'file':'folder',
-          path: '/'+pathExtra.relative(storagePath, rPath),
-          name: pathExtra.basename(rPath),
-          ext: pathExtra.extname(rPath),
-          size: stat.size,
-          contentType: mime.lookup(rPath),
-          mtime: stat.mtime
-        };
-        return done(meta);
-      }
+    itemPath = relativePath( itemPath );
+    if( fs.existsSync(itemPath) ){
+      var stat = fs.lstatSync( itemPath );
+      return done({
+        type: stat.isFile()?'file':'folder',
+        path: '/'+pathExtra.relative(storagePath, itemPath),
+        name: pathExtra.basename(itemPath),
+        ext: pathExtra.extname(itemPath),
+        size: stat.size,
+        contentType: mime.lookup(itemPath),
+        mtime: stat.mtime
+      });
     }
-    done('not-found');
   },
   remove: function(filePath, done){
-    filePath = pathExtra.normalize(filePath);
-    var rPath = pathExtra.resolve(storagePath, filePath);
-    if( rPath.match(new RegExp("^"+filePath)) ){
-      fs.remove( rPath, done)
+    filePath = relativePath( filePath );
+    if( fs.existsSync(filePath) ){
+      fs.remove( filePath, done)
     }else{
       done('not-found');
     }
   },
   addDir: function(dirPath, done){
-    dirPath = pathExtra.normalize(dirPath);
-    var rPath = pathExtra.resolve(storagePath, dirPath);
-    if( rPath.match(new RegExp("^"+storagePath)) ){
-      fs.mkdir( rPath, done)
+    dirPath = relativePath( dirPath );
+    if( fs.existsSync(dirPath) ) {
+      done('dir-exists');
     }else{
-      done('not-found');
+      fs.mkdir( dirPath, done)
     }
   },
   changeHome: function(newPath, done){

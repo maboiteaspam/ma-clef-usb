@@ -20,7 +20,7 @@ if( fs.existsSync(maClefUsbPath) == false ){
 }
 maClefUsb.changeHome(maClefUsbPath);
 
-var controller = {
+var controllers = {
   changeHome:function(req, res){
     var newPath = req.body.newPath;
     maClefUsb.changeHome(newPath,function(ok){
@@ -119,15 +119,15 @@ var start = function(options, done) {
   app.use(busboy());
   app.use(bodyParser.urlencoded({ extended: false }));
 
-  app.post('/change-home', controller.changeHome);
-  app.post('/readdir', controller.readdir);
-  app.get(/\/readfile\/(.+)/, controller.readfile);
-  app.get(/\/download\/(.+)/, controller.download);
-  app.post('/readmeta', controller.readmeta);
-  app.post('/rename', controller.rename);
-  app.post('/remove', controller.remove);
-  app.post('/add', controller.add);
-  app.post('/add-dir', controller.addDir);
+  app.post('/change-home', controllers.changeHome);
+  app.post('/readdir', controllers.readdir);
+  app.get(/\/readfile\/(.+)/, controllers.readfile);
+  app.get(/\/download\/(.+)/, controllers.download);
+  app.post('/readmeta', controllers.readmeta);
+  app.post('/rename', controllers.rename);
+  app.post('/remove', controllers.remove);
+  app.post('/add', controllers.add);
+  app.post('/add-dir', controllers.addDir);
 
   app.use(express.static(__dirname + '/public'));
   server = http.createServer(app);
@@ -143,6 +143,7 @@ var stop = function(done) {
 
 module.exports.start = start;
 module.exports.stop = stop;
+module.exports.controllers = controllers; // testing purpose
 
 if( !module.parent ){
   var port = 8080;
