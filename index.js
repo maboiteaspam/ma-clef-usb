@@ -7,6 +7,7 @@ var mime = require('mime');
 var express = require('express');
 var http = require('http');
 var busboy = require('connect-busboy');
+var bodyParser = require('body-parser');
 var server;
 
 var pkg = require(__dirname+'/package.json');
@@ -70,16 +71,17 @@ var maClefUsb = (function(){
     },
     readdir: function(dirPath, done){
       dirPath = pathExtra.normalize(dirPath);
-      var rPath = pathExtra.resolve(storagePath, dirPath);
+      var rPath = pathExtra.join(storagePath, dirPath);
+      rPath = pathExtra.resolve(storagePath, rPath);
       if( rPath.match(new RegExp("^"+storagePath)) ){
-        glob("/*", {cwd:rPath}, function (er, files) {
+        glob("*", {cwd:rPath}, function (er, files) {
           var items = [];
           files.forEach(function(file){
-            var filePath = pathExtra.join(filePath, file);
-            var stat = fs.lstatSync(filePath);
+            var filePath = pathExtra.join(rPath, file);
+            var stat = fs.lstatSync( filePath );
             items.push({
               type: stat.isFile()?'file':'folder',
-              path: filePath,
+              path: '/'+pathExtra.relative(storagePath, filePath),
               name: file,
               ext: pathExtra.extname(file),
               size: stat.size,
@@ -102,11 +104,11 @@ var maClefUsb = (function(){
       }
     },
     changeHome: function(newPath, done){
-      if( fs.existsSync(storagePath) == false ){
-        done('not-found')
+      if( fs.existsSync(newPath) == false ){
+        if( done ) done('not-found')
       } else{
-        storagePath = path.resolve(newPath);
-        done(true)
+        storagePath = pathExtra.resolve(newPath);
+        if( done ) done(true)
       }
     }
   };
@@ -122,19 +124,20 @@ maClefUsb.changeHome(maClefUsbPath);
 var start = function(options, done) {
   var app = express();
   app.use(busboy());
-  app.get('/change-home', function(req, res){
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.post('/change-home', function(req, res){
     var newPath = req.body.newPath;
     maClefUsb.changeHome(newPath,function(ok){
       res.status(ok?200:404).send()
     });
   });
-  app.get('/readdir', function(req, res){
-    var filePath = req.body.filePath;
-    maClefUsb.readdir(filePath,function(list){
+  app.post('/readdir', function(req, res){
+    var dirPath = req.body.dirPath;
+    maClefUsb.readdir(dirPath,function(list){
       res.send( list );
     });
   });
-  app.get('/readfile', function(req, res){
+  app.post('/readfile', function(req, res){
     var filePath = req.body.filePath;
     maClefUsb.readfile(filePath,function(err, stream){
       var type = mime.lookup(filePath);
@@ -145,7 +148,7 @@ var start = function(options, done) {
       stream.pipe(res);
     });
   });
-  app.get('/rename', function(req, res){
+  app.post('/rename', function(req, res){
     var oldPath = req.body.oldPath;
     var newPath = req.body.newPath;
     maClefUsb.rename(oldPath, newPath,function(success){
@@ -153,7 +156,7 @@ var start = function(options, done) {
       res.status(ok?200:404).send()
     });
   });
-  app.get('/remove', function(req, res){
+  app.post('/remove', function(req, res){
     var filePath = req.body.filePath;
     maClefUsb.remove(filePath,function(success){
       var ok = success == 'not-found';

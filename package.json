@@ -26,6 +26,7 @@
     "node": "*"
   },
   "dependencies": {
+    "body-parser": "^1.9.3",
     "commander": "2.3.0",
     "connect-busboy": "0.0.2",
     "express": "^4.8.2",
