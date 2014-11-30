@@ -22,6 +22,7 @@
   "bin": {
     "ma-clef-usb": "bin.js"
   },
+  "main": "cozy.js",
   "contributors": [
     "maboiteaspam"
   ],
