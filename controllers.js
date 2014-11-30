@@ -2,13 +2,10 @@
 
 
 var formidable = require('formidable');
-var util = require('util');
 
 var pathExtra = require('path-extra');
 var fs = require('fs-extra');
 var mime = require('mime');
-var busboy = require('connect-busboy');
-var bodyParser = require('body-parser');
 
 var maClefUsb = require('./ma-clef-usb');
 
