@@ -6,6 +6,20 @@
 Ma clef Usb, a webapp on top of cozy-light PAAS to transfer files between computers,
 what we use to do with usb  stick in old times !
 
+# Use cases
+- Transfer files
+- Put down some notes
+- Browse your files
+
+# User interface compatibility
+- HTML5 compatible
+- mobile compliant
+
+# Technical information
+- Server build on top of nodeJS / expressJS
+- UI built on top of angularJS / bootstrap
+- no database, just a webserver and a file system
+
 
 # Install with cozy-light
 Install Node.js (>= 0.10),
@@ -41,12 +55,6 @@ ma-clef-usb start [-p 8080] [-h 127.0.0.1] [-H ~/ma-clef-usb]
 - -p --port default:8080 Port on which http server listens.
 - -h --hostname default:127.0.0.1 Hostname on which http server listens.
 - -H --home default:~/ma-clef-usb Home directory used by ma Clef USB.
-
-# Use cases
-
-* Transfer files
-* Put down some notes
-* Browse your files
 
 # Configuration
 
