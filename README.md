@@ -1,5 +1,7 @@
-# Ma Clef USB
 
+**Tests status**: ![Travis Badge](https://api.travis-ci.org/maboiteaspam/ma-clef-usb.svg)
+
+# Ma Clef USB
 
 ![Cozy Logo](https://raw.github.com/cozy/cozy-setup/gh-pages/assets/images/happycloud.png)
 
@@ -19,10 +21,6 @@ what we use to do with usb  stick in old times !
 - Server build on top of nodeJS / expressJS
 - UI built on top of angularJS / bootstrap
 - no database, just a webserver and a file system
-
-### Status
-**Tests status**: ![Travis Badge](https://api.travis-ci.org/maboiteaspam/ma-clef-usb.svg)
-
 
 # Install with cozy-light
 Install Node.js (>= 0.10),
