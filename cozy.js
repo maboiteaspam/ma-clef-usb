@@ -1,5 +1,6 @@
 'use strict';
 
+var pathExtra = require('path-extra');
 var express = require('express');
 var http = require('http');
 var maClefUsb = require('./ma-clef-usb');
