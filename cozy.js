@@ -1,5 +1,6 @@
 'use strict';
 
+var fs = require('fs-extra');
 var pathExtra = require('path-extra');
 var express = require('express');
 var http = require('http');
