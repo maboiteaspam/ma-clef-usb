@@ -30,7 +30,7 @@ Install Node.js (>= 0.10)
 npm i maboiteaspam/ma-clef-usb -g
 ```
 
-# Run the platform
+# Run the standalone app
 browse http://localhost:8080/
 ```
 ma-clef-usb start [-p 8080] [-h 127.0.0.1] [-H ~/ma-clef-usb]
