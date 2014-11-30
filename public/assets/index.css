@@ -102,3 +102,10 @@ body {
 .popin-body.visible .panel{
     box-shadow: -10px 10px 50px rgba(85, 85, 85, .5);
 }
+.previewFile .panel-body{
+    text-align: center;
+}
+.previewFile .panel-body img{
+    max-width: 100%;
+    display: inline-block;
+}

@@ -4,6 +4,7 @@
         {{item.name}}
         {{item.contentType}}
         {{item.size}}
+        <br/>
         <audio controls ng-if="getMediaType()=='sound'">
             <source src="readfile/{{item.path}}"
                     type="{{item.contentType}}">
@@ -16,6 +17,7 @@
         </video>
         <img src="readfile/{{item.path}}"
              alt="{{item.nme}}"
+             max-height
              ng-if="getMediaType()=='picture'" />
 
         <iframe ng-if="getMediaType()=='text'"
