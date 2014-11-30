@@ -20,6 +20,9 @@ what we use to do with usb  stick in old times !
 - UI built on top of angularJS / bootstrap
 - no database, just a webserver and a file system
 
+### Status
+**Tests status**: ![Travis Badge](https://travis-ci.org/cozy-labs/cozy-light.svg)
+
 
 # Install with cozy-light
 Install Node.js (>= 0.10),
