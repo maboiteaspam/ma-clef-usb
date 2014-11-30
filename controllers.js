@@ -1,11 +1,29 @@
 'use strict';
 
+
+var formidable = require('formidable');
+var util = require('util');
+
+var pathExtra = require('path-extra');
 var fs = require('fs-extra');
 var mime = require('mime');
 var busboy = require('connect-busboy');
 var bodyParser = require('body-parser');
 
 var maClefUsb = require('./ma-clef-usb');
+
+var respondErrorCode = function( code, res ){
+  if( code == 'not-found' ){
+    res.status(404).send(code)
+  } else if( code == 'not-acceptable' ){
+    res.status(500).send(code)
+  } else if( code == 'dir-exists' ){
+    res.status(500).send(code)
+  } else {
+    return false;
+  }
+  return true;
+};
 
 var controllers = {
   changeHome:function(req, res){
@@ -15,19 +33,26 @@ var controllers = {
     });
   },
   readdir:function(req, res){
-    var dirPath = req.body.dirPath;
-    maClefUsb.readdir(dirPath,function(list){
-      res.send( list );
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var dirPath = fields.dirPath;
+      if( ! dirPath ){
+        res.status(500).send("missing dirPath param")
+      }else{
+        maClefUsb.readdir(dirPath,function(list){
+          if( !respondErrorCode(list,res) ){
+            res.send( list );
+          }
+        });
+      }
     });
   },
   readfile:function(req, res){
     var filePath = req.params[0];
     maClefUsb.readmeta(filePath,function(item){
-      if( item == 'not-found' ){
-        res.status(404).send()
-      }else if(item.type!='file'){
+      if(item.type!='file'){
         res.status(300).send()
-      }else{
+      } else if( !respondErrorCode(item, res) ){
         var type = item.contentType;
         if (!res.getHeader('content-type')) {
           var charset = mime.charsets.lookup(type);
@@ -37,12 +62,6 @@ var controllers = {
           stream.pipe(res);
         });
       }
-    });
-  },
-  readmeta:function(req, res){
-    var itemPath = req.body.itemPath;
-    maClefUsb.readmeta(itemPath,function(list){
-      res.send( list );
     });
   },
   download:function(req, res){
@@ -65,37 +84,86 @@ var controllers = {
       }
     });
   },
+  readmeta:function(req, res){
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var itemPath = fields.itemPath;
+      if( ! itemPath ){
+        res.status(500).send("missing itemPath param")
+      }else{
+        maClefUsb.readmeta(itemPath,function(list){
+          if( !respondErrorCode(list,res) ){
+            res.send( list );
+          }
+        });
+      }
+    });
+  },
   rename:function(req, res){
-    var oldPath = req.body.oldPath;
-    var newPath = req.body.newPath;
-    maClefUsb.rename(oldPath, newPath,function(success){
-      var ok = success == 'not-found';
-      res.status(ok?200:404).send()
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var oldPath = fields.oldPath;
+      var newPath = fields.newPath;
+      if( ! oldPath ){
+        res.status(500).send("missing oldPath param")
+      }else if( ! newPath ){
+        res.status(500).send("missing newPath param")
+      }else{
+        maClefUsb.rename(oldPath, newPath,function(success){
+          if( !respondErrorCode(success,res) ){
+            res.send( success );
+          }
+        });
+      }
     });
   },
   remove:function(req, res){
-    var filePath = req.body.filePath;
-    maClefUsb.remove(filePath,function(success){
-      var ok = success == 'not-found';
-      res.status(ok?200:404).send()
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var filePath = fields.filePath;
+      if( ! filePath ){
+        res.status(500).send("missing filePath param")
+      }else{
+        maClefUsb.remove(filePath,function(success){
+          if( !respondErrorCode(success,res) ){
+            res.send( success );
+          }
+        });
+      }
     });
   },
   add:function(req, res){
-    var path = req.body.path;
-    req.pipe(req.busboy);
-    req.busboy.on('file', function (fieldName, file, fileName) {
-      console.log("Uploading fieldName " + fieldName);
-      console.log("Uploading fileName " + fileName);
-      maClefUsb.write(path, fileName, file, function(success){
-        res.send( success );
-      });
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var path = fields.path;
+      if( ! path ){
+        res.status(500).send("missing path param")
+      }else{
+        maClefUsb.write(path, files.file.name, fs.createReadStream(files.file.path), function(success){
+          if( !respondErrorCode(success,res) ){
+            res.send( success );
+          }
+        });
+      }
     });
   },
   addDir:function(req, res){
-    var dirPath = req.body.dirPath;
-    maClefUsb.addDir(dirPath,function(success){
-      var ok = success == 'not-found';
-      res.status(ok?200:404).send()
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var dirPath = fields.dirPath;
+      if( ! dirPath ){
+        res.status(500).send("missing dirPath param")
+      }else{
+        maClefUsb.addDir(dirPath,function(success){
+          if( !respondErrorCode(success,res) ){
+            maClefUsb.readdir(pathExtra.dirname(dirPath),function(list){
+              if( !respondErrorCode(list,res) ){
+                res.send( list );
+              }
+            });
+          }
+        });
+      }
     });
   }
 };
@@ -103,9 +171,6 @@ var controllers = {
 module.exports = {
   controllers:controllers,
   connect:function(app){
-    app.use(busboy());
-    app.use(bodyParser.urlencoded({ extended: false }));
-
     app.post('/change-home', controllers.changeHome);
     app.post('/readdir', controllers.readdir);
     app.get(/\/readfile\/(.+)/, controllers.readfile);
@@ -113,7 +178,7 @@ module.exports = {
     app.post('/readmeta', controllers.readmeta);
     app.post('/rename', controllers.rename);
     app.post('/remove', controllers.remove);
-    app.post('/add', controllers.add);
     app.post('/add-dir', controllers.addDir);
+    app.post('/add', controllers.add);
   }
 };

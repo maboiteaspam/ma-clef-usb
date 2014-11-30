@@ -19,4 +19,3 @@ module.exports.start = function(options, done) {
 module.exports.stop = function(done) {
   done();
 };
-module.exports.controllers = controllers; // testing purpose

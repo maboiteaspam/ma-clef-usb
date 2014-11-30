@@ -2,23 +2,19 @@
 var fs = require('fs-extra');
 var pathExtra = require('path-extra');
 var express = require('express');
-var bodyParser = require('body-parser');
-var supertest = require('supertest');
+var request = require('request');
 var assert = require('assert');
 
 var maClefUsb = require('./ma-clef-usb');
+var controllers = require('./controllers');
 
 var workingDir = pathExtra.join( __dirname, '/.test-working_dir/');
 var fixturesDir = pathExtra.join( __dirname, '/fixtures/');
 
-if( fs.existsSync(workingDir) == false ){
-  fs.mkdirSync(workingDir);
-}
-maClefUsb.changeHome(workingDir);
-
 before(function(){
   fs.removeSync(workingDir);
   fs.mkdirSync(workingDir);
+  maClefUsb.changeHome(workingDir);
 });
 
 
@@ -354,23 +350,114 @@ describe('maClefUsb', function () {
 });
 
 
-//describe('Controllers', function () {
-//
-//  var app = express();
-//  var jsonParser = bodyParser.json();
-//  var urlencodedParser = bodyParser.urlencoded({ extended: false });
-//  app.use(urlencodedParser);
-//  app.use(jsonParser);
-//  app.use('/list-apps', controllers.listApps);
-//
-//  describe('install', function () {
-//    it('should install app', function (done) {
-//      this.timeout(10000);
-//      supertest( app )
-//        .post('/install-app')
-//        .send({app:'cozy-labs/hello'})
-//        .expect(200, done);
-//    });
-//  });
-//});
+describe('Controllers', function () {
+  var app;
+
+  before(function(){
+    fs.removeSync(workingDir);
+    fs.mkdirSync(workingDir);
+    maClefUsb.changeHome(workingDir);
+    app = express();
+    controllers.connect(app);
+    app.listen(3000)
+  });
+
+
+  describe('readdir', function () {
+    it('should answer 200', function (done) {
+      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'/'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,200,'must respond 200')
+          assert.ok(body.match(/\[\]/),'must respond []')
+          done();
+        });
+    });
+    it('should answer 500', function (done) {
+      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'../'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,500,'must respond 500')
+          assert.ok(body.match(/not-acceptable/),'must respond not-acceptable')
+          done();
+        });
+    });
+    it('should answer 404', function (done) {
+      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'/not-found'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,404,'must respond 404')
+          assert.ok(body.match(/not-found/),'must respond not-found')
+          done();
+        });
+    });
+    it('should answer 500', function (done) {
+      request.post({url:'http://localhost:3000/readdir',form:{}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,500,'must respond 500')
+          assert.ok(body.match(/missing dirPath param/),'must respond missing dirPath param')
+          done();
+        });
+    });
+  });
+
+  describe('addDir', function () {
+    it('should answer 200', function (done) {
+      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'/test2'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,200,'must respond 200')
+          assert.ok(body.match(/path":"\/test2","name":"test2"/),'must respond items')
+          done();
+        });
+    });
+    it('should answer 500', function (done) {
+      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'/test2'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,500,'must respond 500')
+          assert.ok(body.match(/dir-exists/),'must respond dir-exists')
+          done();
+        });
+    });
+    it('should answer 500', function (done) {
+      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'../test2'}},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,500,'must respond 500')
+          assert.ok(body.match(/not-acceptable/),'must respond not-acceptable')
+          done();
+        });
+    });
+    it('should answer 500', function (done) {
+      request.post({url:'http://localhost:3000/add-dir'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,500,'must respond 500')
+          assert.ok(body.match(/missing dirPath param/),'must respond testupload')
+          done();
+        });
+    });
+  });
+
+  describe('add', function () {
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/add'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null')
+          assert.equal(response.statusCode,200,'must respond 200')
+          assert.ok(body.match(/testupload/),'must respond testupload')
+          done();
+      });
+      var form = r.form();
+      form.append('path', '/');
+      form.append('file',
+        fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
+        {filename: 'testupload.jpg'});
+    });
+  });
+
+
+});
 
