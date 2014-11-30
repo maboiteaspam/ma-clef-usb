@@ -31,14 +31,11 @@
   "dependencies": {
     "body-parser": "^1.9.3",
     "commander": "2.3.0",
-    "connect-busboy": "0.0.2",
     "express": "^4.8.2",
     "formidable": "^1.0.15",
     "fs-extra": "0.10.0",
     "glob": "^4.2.1",
     "mime": "^1.2.11",
-    "mkdirp": "0.5.0",
-    "morgan": "1.2.2",
     "path-extra": "0.2.1",
     "printit": "0.1.3"
   },
