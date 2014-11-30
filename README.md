@@ -17,7 +17,8 @@ cozy-light install maboiteaspam/cozy-dashboard
 cozy-light install maboiteaspam/ma-clef-usb 
 ```
 
-# Run the platform, browse http://localhost:19104/
+# Run the platform
+browse http://localhost:19104/
 ```
 cozy-light start
 ```
@@ -29,7 +30,8 @@ Install Node.js (>= 0.10)
 npm i maboiteaspam/ma-clef-usb -g
 ```
 
-# Run the platform, browse http://localhost:8080/
+# Run the platform
+browse http://localhost:8080/
 ```
 ma-clef-usb start [-p 8080] [-h 127.0.0.1] [-H ~/ma-clef-usb]
 ```
