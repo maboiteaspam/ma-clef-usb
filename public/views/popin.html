@@ -3,26 +3,32 @@
      ng-click="$root.$broadcast('hidePopin')"></div>
 
 <div ng-include="'views/popins/help.html'"
+     ng-if="name=='help'"
      ng-class="{visible: name=='help'}"
      class="help popin-body"></div>
 
 <div ng-include="'views/popins/about.html'"
+     ng-if="name=='about'"
      ng-class="{visible: name=='about'}"
      class="about popin-body"></div>
 
 <div ng-include="'views/popins/addNote.html'"
+     ng-if="name=='addNote'"
      ng-class="{visible: name=='addNote'}"
      class="addFile popin-body"></div>
 
 <div ng-include="'views/popins/addFile.html'"
+     ng-if="name=='addFile'"
      ng-class="{visible: name=='addFile'}"
      class="addFile popin-body"></div>
 
 <div ng-include="'views/popins/addFolder.html'"
+     ng-if="name=='addFolder'"
      ng-class="{visible: name=='addFolder'}"
      class="addFolder popin-body"></div>
 
 <div ng-include="'views/popins/wontBrowse.html'"
+     ng-if="name=='wontBrowse'"
      ng-class="{visible: name=='wontBrowse'}"
      class="wontBrowse popin-body"></div>
 

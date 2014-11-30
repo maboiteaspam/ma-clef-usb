@@ -28,7 +28,17 @@ angular
         }
       });
     }
-
+    return {
+      restrict: 'A',
+      link: link
+    };
+  })
+  .directive('autoFocus', function($timeout) {
+    function link(scope, element, attrs) {
+      $timeout(function(){
+        element.focus();
+      },250);
+    }
     return {
       restrict: 'A',
       link: link
