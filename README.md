@@ -6,16 +6,16 @@
 Ma clef Usb, a webapp on top of cozy-light PAAS to transfer files between computers,
 what we use to do with usb  stick in old times !
 
-# Use cases
+## Use cases
 - Transfer files
 - Put down some notes
 - Browse your files
 
-# User interface compatibility
+## User interface compatibility
 - HTML5 compatible
 - mobile compliant
 
-# Technical information
+## Technical information
 - Server build on top of nodeJS / expressJS
 - UI built on top of angularJS / bootstrap
 - no database, just a webserver and a file system
