@@ -14,21 +14,22 @@ angular.module('maClefUsbApp')
 
     var update_breadcrumb = function(path){
       $scope.breadcrumb = [];
-      var c_path = '/';
+      var c_path = '';
       var path_items = path.split('/');
-      path_items[0] = '/';
+      if( path == '/' ) path_items.shift();
+      path_items[0] = '';
       path_items.forEach(function(path_item){
         if( path_item ){
           c_path+=path_item+'/';
-          $scope.breadcrumb.push({
-            name:path_item=='/'?'home':path_item,
-            path:c_path,
-            active:false,
-            type:'folder',
-            ext:'',
-            size:''
-          });
         }
+        $scope.breadcrumb.push({
+          name:path_item==''?'home':path_item,
+          path:c_path,
+          active:false,
+          type:'folder',
+          ext:'',
+          size:''
+        });
       });
       _($scope.breadcrumb).last().active = true;
     };
