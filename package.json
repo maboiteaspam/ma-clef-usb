@@ -19,6 +19,9 @@
   "bugs": {
     "url": "https://github.com/maboiteaspam/ma-clef-usb/issues"
   },
+  "bin": {
+    "ma-clef-usb": "bin.js"
+  },
   "contributors": [
     "maboiteaspam"
   ],

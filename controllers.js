@@ -1,24 +1,11 @@
 'use strict';
 
 var fs = require('fs-extra');
-var pathExtra = require('path-extra');
 var mime = require('mime');
-
-var express = require('express');
-var http = require('http');
 var busboy = require('connect-busboy');
 var bodyParser = require('body-parser');
-var server;
+
 var maClefUsb = require('./ma-clef-usb');
-
-var pkg = require(__dirname+'/package.json');
-
-var maClefUsbPath = pathExtra.join(pathExtra.homedir(), 'ma-clef-usb');
-
-if( fs.existsSync(maClefUsbPath) == false ){
-  fs.mkdirSync(maClefUsbPath);
-}
-maClefUsb.changeHome(maClefUsbPath);
 
 var controllers = {
   changeHome:function(req, res){
@@ -113,48 +100,20 @@ var controllers = {
   }
 };
 
-var start = function(options, done) {
-  var app = express();
+module.exports = {
+  controllers:controllers,
+  connect:function(app){
+    app.use(busboy());
+    app.use(bodyParser.urlencoded({ extended: false }));
 
-  app.use(busboy());
-  app.use(bodyParser.urlencoded({ extended: false }));
-
-  app.post('/change-home', controllers.changeHome);
-  app.post('/readdir', controllers.readdir);
-  app.get(/\/readfile\/(.+)/, controllers.readfile);
-  app.get(/\/download\/(.+)/, controllers.download);
-  app.post('/readmeta', controllers.readmeta);
-  app.post('/rename', controllers.rename);
-  app.post('/remove', controllers.remove);
-  app.post('/add', controllers.add);
-  app.post('/add-dir', controllers.addDir);
-
-  app.use(express.static(__dirname + '/public'));
-  server = http.createServer(app);
-  server.listen( options.getPort() );
-  done(null, app, server);
+    app.post('/change-home', controllers.changeHome);
+    app.post('/readdir', controllers.readdir);
+    app.get(/\/readfile\/(.+)/, controllers.readfile);
+    app.get(/\/download\/(.+)/, controllers.download);
+    app.post('/readmeta', controllers.readmeta);
+    app.post('/rename', controllers.rename);
+    app.post('/remove', controllers.remove);
+    app.post('/add', controllers.add);
+    app.post('/add-dir', controllers.addDir);
+  }
 };
-
-var stop = function(done) {
-  done();
-};
-
-
-
-module.exports.start = start;
-module.exports.stop = stop;
-module.exports.controllers = controllers; // testing purpose
-
-if( !module.parent ){
-  var port = 8080;
-  var opts = {
-    getPort:function(){
-      return ++port;
-    }
-  };
-
-  start(opts,function(){
-    console.log(pkg.displayName +' started http://localhost:'+port+'/');
-    console.log('ready')
-  });
-}
