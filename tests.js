@@ -23,7 +23,7 @@ before(function(){
 
 
 after(function(){
-  //fs.removeSync(workingDir);
+  fs.removeSync(workingDir);
 });
 
 
@@ -37,6 +37,21 @@ describe('maClefUsb', function () {
       maClefUsb.addDir('/test2',function(){
         assert(fs.existsSync(pathExtra.join(workingDir,'/test2')),
           'did not create dir');
+        done();
+      });
+    });
+    it(' should not create directory outside home directory', function (done) {
+      maClefUsb.addDir('../test2',function(err){
+        assert.equal(fs.existsSync(pathExtra.join(workingDir,'..','test2')), false,
+          'must not create directory');
+        assert.equal(err,"not-acceptable",'must return correct answer');
+        done();
+      });
+    });
+    it(' should not create directory outside home directory', function (done) {
+      maClefUsb.addDir('/../test4',function(){
+        assert.equal(fs.existsSync(pathExtra.join(workingDir,'test4')), true,
+          'must create directory inside home');
         done();
       });
     });
@@ -55,7 +70,7 @@ describe('maClefUsb', function () {
         assert.notEqual(items, 'not-found',
           'wrong storePath');
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
-          'did not copy file');
+          'did not write file');
         done();
       });
     });
@@ -64,7 +79,7 @@ describe('maClefUsb', function () {
       var storePath = '/';
       var fileName = 'test.jpeg';
       maClefUsb.write(storePath,fileName,fstream,function(items){
-        assert.equal(items.length, 1,
+        assert.ok(items.length>1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
           'name is wrong');
@@ -99,6 +114,17 @@ describe('maClefUsb', function () {
         });
       });
     });
+    it('should not write file outside home directory', function (done) {
+      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var storePath = '../';
+      var fileName = 'test.jpeg';
+      maClefUsb.write(storePath,fileName,fstream,function(items){
+        assert.equal(items, 'not-acceptable', 'wrong storePath');
+        assert.equal(fs.existsSync(pathExtra.join(workingDir,storePath,'../',fileName)), false,
+          'must not write file');
+        done();
+      });
+    });
   });
 
   describe('rename', function () {
@@ -109,16 +135,44 @@ describe('maClefUsb', function () {
       maClefUsb.write(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
-        done();
+        fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+        var fileName2 = 'test22.jpeg';
+        maClefUsb.write(storePath,fileName2,fstream,function(){
+          assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName2)),
+            'did not copy file');
+          done();
+        });
       });
     });
     after(function(){
-      fs.unlinkSync( pathExtra.join(workingDir,'/test-renamed.jpeg') );
+      try{
+        fs.unlinkSync( pathExtra.join(workingDir,'/test-renamed.jpeg') );
+      }catch(ex){}
+      try{
+        fs.unlinkSync( pathExtra.join(workingDir,'/test22.jpeg') );
+      }catch(ex){}
     });
     it('should rename file', function (done) {
       maClefUsb.rename('/test.jpeg','/test-renamed.jpeg',function(){
         assert(fs.existsSync(pathExtra.join(workingDir,'/test-renamed.jpeg')),
           'did not rename file');
+        done();
+      });
+    });
+    it('should not rename non existent file', function (done) {
+      maClefUsb.rename('/no-file.jpeg','/no-file-renamed.jpeg',function(err){
+        assert.equal(err, 'not-found', 'wrong storePath');
+        assert.equal(fs.existsSync(pathExtra.join(workingDir,'/no-file-renamed.jpeg')),
+          false, 'must not rename file');
+        done();
+      });
+    });
+    it('should not rename as an existent file', function (done) {
+      maClefUsb.rename('/test-renamed.jpeg','/test22.jpeg',function(err){
+        assert.notEqual(err,null,"must throw error")
+        assert.equal(err,"file-exists","must throw correct error")
+        assert(fs.existsSync(pathExtra.join(workingDir,'test-renamed.jpeg')),
+          'must not rename file');
         done();
       });
     });
@@ -158,6 +212,13 @@ describe('maClefUsb', function () {
         stream.read();
       });
     });
+    it('can not read file outside home directory', function (done) {
+      maClefUsb.readfile('../package.json',function(err, stream){
+        assert.equal(err, 'not-acceptable', 'err must be correct');
+        assert.equal(stream, null, 'stream must be null');
+        done();
+      });
+    });
   });
 
   describe('readdir', function () {
@@ -176,12 +237,18 @@ describe('maClefUsb', function () {
     });
     it('list directory items', function (done) {
       maClefUsb.readdir('/',function(items){
-        assert.equal(items.length, 1,
+        assert.ok(items.length>1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
           'response is missing new file');
         assert.equal(items[0].path, '/test.jpeg',
           'response is missing new file');
+        done();
+      });
+    });
+    it('can not read dir outside home directory', function (done) {
+      maClefUsb.readfile('../',function(err){
+        assert.equal(err, 'not-acceptable', 'err must be correct');
         done();
       });
     });
@@ -219,6 +286,12 @@ describe('maClefUsb', function () {
         done();
       });
     });
+    it('can not get meta outside home directory', function (done) {
+      maClefUsb.readfile('../package.json',function(err){
+        assert.equal(err, 'not-acceptable', 'err must be correct');
+        done();
+      });
+    });
   });
 
   describe('remove', function () {
@@ -244,6 +317,12 @@ describe('maClefUsb', function () {
       maClefUsb.remove('/test2',function(){
         assert(!fs.existsSync(pathExtra.join(workingDir,'/test.jpeg')),
           'did not remove file');
+        done();
+      });
+    });
+    it('can not delete item outside home directory', function (done) {
+      maClefUsb.readfile('../package.json',function(err){
+        assert.equal(err, 'not-acceptable', 'err must be correct');
         done();
       });
     });

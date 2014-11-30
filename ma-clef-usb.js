@@ -10,13 +10,20 @@ var storagePath = '';
 var relativePath = function(p){
   var p = pathExtra.normalize(p);
   p = pathExtra.join(storagePath, p);
+  p = pathExtra.resolve(p);
   return p;
+};
+
+var isAcceptablePath = function(p){
+  return !!p.match(new RegExp("^"+storagePath));
 };
 
 var api = {
   write: function(storePath, fileName, file, done){
     var astorePath = relativePath(storePath);
-    if( fs.existsSync(astorePath) ){
+    if(!isAcceptablePath(astorePath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(astorePath) ){
       var rstoreFilePath = relativePath( pathExtra.join(storePath, fileName) );
       var fstream = fs.createWriteStream( rstoreFilePath );
       file.pipe(fstream);
@@ -35,7 +42,11 @@ var api = {
   rename: function(oldPath, newPath, done){
     var roldPath = relativePath( oldPath );
     var rnewPath = relativePath( newPath );
-    if( fs.existsSync(rnewPath) ){
+    if(!isAcceptablePath(roldPath) ){
+      done("not-acceptable")
+    }else if(!isAcceptablePath(rnewPath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(rnewPath) ){
       done('file-exists');
     }else if( fs.existsSync(roldPath) ){
       fs.rename(roldPath, rnewPath, done);
@@ -45,14 +56,18 @@ var api = {
   },
   readfile: function(filePath, done){
     filePath = relativePath( filePath );
-    if( fs.existsSync(filePath) ){
+    if(!isAcceptablePath(filePath) ){
+      return done("not-acceptable")
+    }else if( fs.existsSync(filePath) ){
       return done(null,fs.createReadStream(filePath));
     }
     done('not-found');
   },
   readdir: function(dirPath, done){
     var rstoreFilePath = relativePath( dirPath );
-    if( fs.existsSync(rstoreFilePath) ){
+    if(!isAcceptablePath(rstoreFilePath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(rstoreFilePath) ){
       glob("*", {cwd:rstoreFilePath}, function (er, files) {
         var items = [];
         files.forEach(function(file){
@@ -76,7 +91,9 @@ var api = {
   },
   readmeta: function(itemPath, done){
     itemPath = relativePath( itemPath );
-    if( fs.existsSync(itemPath) ){
+    if(!isAcceptablePath(itemPath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(itemPath) ){
       var stat = fs.lstatSync( itemPath );
       return done({
         type: stat.isFile()?'file':'folder',
@@ -91,7 +108,9 @@ var api = {
   },
   remove: function(filePath, done){
     filePath = relativePath( filePath );
-    if( fs.existsSync(filePath) ){
+    if(!isAcceptablePath(filePath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(filePath) ){
       fs.remove( filePath, done)
     }else{
       done('not-found');
@@ -99,7 +118,9 @@ var api = {
   },
   addDir: function(dirPath, done){
     dirPath = relativePath( dirPath );
-    if( fs.existsSync(dirPath) ) {
+    if(!isAcceptablePath(dirPath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(dirPath) ) {
       done('dir-exists');
     }else{
       fs.mkdir( dirPath, done)
