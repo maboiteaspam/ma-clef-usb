@@ -11,11 +11,11 @@ describe('Controllers', function () {
   });
   describe('readdir', function () {
     it('should answer 200', function (done) {
-      request.get('http://localhost:19104/ma-clef-usb',
+      request.get('http://localhost:19104/apps/ma-clef-usb/',
         function(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/html/),'must respond html')
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/html/),'must respond html');
           done();
         });
     });
