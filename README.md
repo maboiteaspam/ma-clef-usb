@@ -1,5 +1,4 @@
-
-**Tests status**: ![Travis Badge](https://api.travis-ci.org/maboiteaspam/ma-clef-usb.svg)
+![Travis Badge](https://api.travis-ci.org/maboiteaspam/ma-clef-usb.svg)
 
 # Ma Clef USB
 
