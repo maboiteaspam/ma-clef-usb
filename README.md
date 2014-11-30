@@ -21,7 +21,7 @@ what we use to do with usb  stick in old times !
 - no database, just a webserver and a file system
 
 ### Status
-**Tests status**: ![Travis Badge](https://travis-ci.org/cozy-labs/cozy-light.svg)
+**Tests status**: ![Travis Badge](https://api.travis-ci.org/maboiteaspam/ma-clef-usb.svg)
 
 
 # Install with cozy-light
