@@ -13,8 +13,17 @@ angular.module('maClefUsbApp')
       $scope.name = '';
       $scope.dir = {};
       $scope.item = {};
+      $scope.readfilepath = "readfile/"; // required to pass angularjs@sce
       $rootScope.$on('changePath', function(ev,item){
         $scope.item = item;
+        $scope.readfilepath = "readfile/"+item.path;
+        if( item.type == 'folder' ){
+          $scope.dir = item;
+        }
+      });
+      $rootScope.$on('pathChanged', function(ev,item){
+        $scope.item = item;
+        $scope.readfilepath = "readfile/"+item.path;
         if( item.type == 'folder' ){
           $scope.dir = item;
         }
@@ -26,7 +35,7 @@ angular.module('maClefUsbApp')
         $scope.name = '';
       });
       $rootScope.createNote = function(inpath,fileName,content) {
-        $.post("add-note",{dirPath:inpath,fileName:fileName,content:content},function(item){
+        $.post("add-note",{path:inpath,fileName:fileName,content:content},function(item){
           $scope.$apply(function(){
             if( item == 'err'
               || item == 'not-found'
@@ -34,22 +43,22 @@ angular.module('maClefUsbApp')
               || item == 'file-exists' ){
               $rootScope.$broadcast('showPopin', 'wontBrowse');
             } else {
-              $rootScope.$on('changePath',$scope.dir);
-              $root.$broadcast('hidePopin');
+              $rootScope.$broadcast('changePath',$scope.dir);
+              $rootScope.$broadcast('hidePopin');
             }
           });
         });
       };
       $rootScope.createFolder = function(inpath,folderName) {
-        $.post("add-dir",{dirPath:inpath+folderName},function(item){
+        $.post("add-dir",{dirPath:inpath+'/'+folderName},function(item){
           $scope.$apply(function(){
             if( item == 'err'
               || item == 'not-found'
               || item == 'dir-exists' ){
               $rootScope.$broadcast('showPopin', 'wontBrowse');
             } else {
-              $rootScope.$on('changePath',$scope.dir);
-              $root.$broadcast('hidePopin');
+              $rootScope.$broadcast('changePath',$scope.dir);
+              $rootScope.$broadcast('hidePopin');
             }
           });
         });

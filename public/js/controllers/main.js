@@ -20,7 +20,7 @@ angular.module('maClefUsbApp')
       path_items[0] = '';
       path_items.forEach(function(path_item){
         if( path_item ){
-          c_path+=path_item+'/';
+          c_path+='/'+path_item;
         }
         $scope.breadcrumb.push({
           name:path_item==''?'home':path_item,

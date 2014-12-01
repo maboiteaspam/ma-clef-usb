@@ -16,12 +16,12 @@
             Your browser does not support the video element.
         </video>
         <img src="readfile/{{item.path}}"
-             alt="{{item.nme}}"
+             alt="{{item.name}}"
              max-height
              ng-if="getMediaType()=='picture'" />
 
         <iframe ng-if="getMediaType()=='text'"
-                src="readfile/{{item.path}}"></iframe>
+                src="{{readfilepath}}"></iframe>
     </div>
 
     <button type="button" class="close"
