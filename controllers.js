@@ -32,16 +32,12 @@ var controllers = {
   readdir:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-      var dirPath = fields.dirPath;
-      if( ! dirPath ){
-        res.status(500).send("missing dirPath param")
-      }else{
-        maClefUsb.readdir(dirPath,function(list){
-          if( !respondErrorCode(list,res) ){
-            res.send( list );
-          }
-        });
-      }
+      var dirPath = fields.dirPath || '/';
+      maClefUsb.readdir(dirPath,function(list){
+        if( !respondErrorCode(list,res) ){
+          res.send( list );
+        }
+      });
     });
   },
   readfile:function(req, res){

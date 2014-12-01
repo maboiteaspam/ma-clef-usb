@@ -391,12 +391,12 @@ describe('Controllers', function () {
           done();
         });
     });
-    it('should answer 500', function (done) {
+    it('should answer 200', function (done) {
       request.post({url:'http://localhost:3000/readdir',form:{}},
         function optionalCallback(error, response, body) {
           assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,500,'must respond 500')
-          assert.ok(body.match(/missing dirPath param/),'must respond missing dirPath param')
+          assert.equal(response.statusCode,200,'must respond 200')
+          assert.ok(body.match(/\[\]/),'must respond missing dirPath param')
           done();
         });
     });
