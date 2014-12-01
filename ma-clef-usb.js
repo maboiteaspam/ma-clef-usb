@@ -4,6 +4,7 @@ var fs = require('fs-extra');
 var pathExtra = require('path-extra');
 var glob = require("glob");
 var mime = require('mime');
+var Stream = require('stream')
 
 var storagePath = '';
 
@@ -19,26 +20,6 @@ var isAcceptablePath = function(p){
 };
 
 var api = {
-  write: function(storePath, fileName, file, done){
-    var astorePath = relativePath(storePath);
-    if(!isAcceptablePath(astorePath) ){
-      done("not-acceptable")
-    }else if( fs.existsSync(astorePath) ){
-      var rstoreFilePath = relativePath( pathExtra.join(storePath, fileName) );
-      var fstream = fs.createWriteStream( rstoreFilePath );
-      file.pipe(fstream);
-      file.on('readable', function() {
-        var chunk;
-        while (null !== (chunk = file.read())) {
-        }
-      });
-      file.on('close', function () {
-        api.readdir(storePath, done);
-      });
-    }else{
-      done("not-found")
-    }
-  },
   rename: function(oldPath, newPath, done){
     var roldPath = relativePath( oldPath );
     var rnewPath = relativePath( newPath );
@@ -126,6 +107,31 @@ var api = {
       done('dir-exists');
     }else{
       fs.mkdir( dirPath, done)
+    }
+  },
+  add: function(storePath, fileName, file, done){
+    var astorePath = relativePath(storePath);
+    if(!isAcceptablePath(astorePath) ){
+      done("not-acceptable")
+    }else if( fs.existsSync(astorePath) ){
+      var rstoreFilePath = relativePath( pathExtra.join(storePath, fileName) );
+      if( file instanceof Stream.Readable ){
+        var fstream = fs.createWriteStream( rstoreFilePath );
+        file.pipe(fstream);
+        file.on('readable', function() {
+          var chunk;
+          while (null !== (chunk = file.read())) {
+          }
+        });
+        file.on('close', function () {
+          api.readdir(storePath, done);
+        });
+      } else {
+        fs.writeFileSync(rstoreFilePath, file);
+        api.readdir(storePath, done);
+      }
+    }else{
+      done("not-found")
     }
   },
   changeHome: function(newPath, done){

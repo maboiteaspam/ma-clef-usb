@@ -9,7 +9,7 @@
                     <input type="text"
                            disabled
                            class="form-control"
-                           value="{{item.path}}">
+                           value="{{dir.path}}">
                 </div>
             </div>
             <div class="form-group">
@@ -25,7 +25,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button type="submit"
-                            ng-click="$root.$broadcast('createFolder', folderName)"
+                            ng-click="createFolder(dir.path,folderName)"
                             class="btn btn-default">Create</button>
                 </div>
             </div>

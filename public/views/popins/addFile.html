@@ -9,13 +9,20 @@
                     <input type="text"
                            disabled
                            class="form-control"
-                           value="{{item.path}}">
+                           value="{{dir.path}}">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">Drop files</label>
                 <div class="col-sm-10">
                     drop files here
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit"
+                            ng-click="createFile(dir.path)"
+                            class="btn btn-default">Create</button>
                 </div>
             </div>
         </form>

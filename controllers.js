@@ -141,7 +141,28 @@ var controllers = {
       }else if( ! files.file ){
         res.status(500).send("missing file param")
       }else{
-        maClefUsb.write(path, files.file.name, fs.createReadStream(files.file.path), function(success){
+        maClefUsb.add(path, files.file.name, fs.createReadStream(files.file.path), function(success){
+          if( !respondErrorCode(success,res) ){
+            res.send( success );
+          }
+        });
+      }
+    });
+  },
+  addNote:function(req, res){
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var path = fields.path;
+      var fileName = fields.fileName;
+      var content = fields.content;
+      if( ! path ){
+        res.status(500).send("missing path param")
+      }else if( ! fileName ){
+        res.status(500).send("missing fileName param")
+      }else if( ! content ){
+        res.status(500).send("missing content param")
+      }else{
+        maClefUsb.add(path, fileName, content, function(success){
           if( !respondErrorCode(success,res) ){
             res.send( success );
           }
@@ -180,6 +201,7 @@ module.exports = {
     app.post('/readmeta', controllers.readmeta);
     app.post('/rename', controllers.rename);
     app.post('/remove', controllers.remove);
+    app.post('/add-note', controllers.addNote);
     app.post('/add-dir', controllers.addDir);
     app.post('/add', controllers.add);
   }

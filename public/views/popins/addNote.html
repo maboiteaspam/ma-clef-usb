@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-    <div class="panel-heading">Create a new folder</div>
+    <div class="panel-heading">Create a new note</div>
     <div class="panel-body">
 
         <form class="form-horizontal" role="form">
@@ -9,7 +9,7 @@
                     <input type="text"
                            disabled
                            class="form-control"
-                           value="{{item.path}}">
+                           value="{{dir.path}}">
                     </div>
             </div>
             <div class="form-group">
@@ -34,7 +34,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button type="submit"
-                            ng-click="$root.$broadcast('createFolder',fileName,fileContent)"
+                            ng-click="createNote(dir.path,fileName,fileContent)"
                             class="btn btn-default">Create</button>
                 </div>
             </div>

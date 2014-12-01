@@ -53,7 +53,7 @@ describe('maClefUsb', function () {
     });
   });
 
-  describe('write', function () {
+  describe('add', function () {
     after(function(){
       fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
     });
@@ -61,7 +61,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath,fileName,fstream,function(items){
         assert.notEqual(items, 'not-found',
           'wrong storePath');
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
@@ -73,7 +73,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath,fileName,fstream,function(items){
         assert.ok(items.length>1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
@@ -87,7 +87,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/test3';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath,fileName,fstream,function(items){
         assert.equal(items, 'not-found',
           'wrong storePath');
         done();
@@ -98,7 +98,7 @@ describe('maClefUsb', function () {
       var storePath = '/test3';
       var fileName = 'test5.jpeg';
       maClefUsb.addDir(storePath,function(){
-        maClefUsb.write(storePath,fileName,fstream,function(items){
+        maClefUsb.add(storePath,fileName,fstream,function(items){
           assert.notEqual(items, 'not-found',
             'wrong storePath');
           assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
@@ -113,7 +113,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '../';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath,fileName,fstream,function(items){
         assert.equal(items, 'not-acceptable', 'wrong storePath');
         assert.equal(fs.existsSync(pathExtra.join(workingDir,storePath,'../',fileName)), false,
           'must not write file');
@@ -127,12 +127,12 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(){
+      maClefUsb.add(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
         fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
         var fileName2 = 'test22.jpeg';
-        maClefUsb.write(storePath,fileName2,fstream,function(){
+        maClefUsb.add(storePath,fileName2,fstream,function(){
           assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName2)),
             'did not copy file');
           done();
@@ -178,7 +178,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(){
+      maClefUsb.add(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
         done();
@@ -221,7 +221,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(){
+      maClefUsb.add(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
         done();
@@ -254,7 +254,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(){
+      maClefUsb.add(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
         done();
@@ -294,7 +294,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.write(storePath,fileName,fstream,function(){
+      maClefUsb.add(storePath,fileName,fstream,function(){
         assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
           'did not copy file');
         done();
@@ -492,6 +492,77 @@ describe('Controllers', function () {
         });
       var form = r.form();
       form.append('path', '/');
+    });
+  });
+
+  describe('addNote', function () {
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/add-note'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/my_text file/),'must respond "my_text file"');
+          assert.ok(fs.existsSync(workingDir+'my_text file.txt'),'file must exists');
+          assert.ok((fs.readFileSync(workingDir+'my_text file.txt')+'').match(/some content/),
+            'file content must be recorded');
+          done();
+        });
+      var form = r.form();
+      form.append('path', '/');
+      form.append('fileName', 'my_text file.txt');
+      form.append('content', 'some content');
+    });
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/add-note'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/my_text file/),'must respond "my_text file"');
+          assert.ok(fs.existsSync(workingDir+'/test2/my_text file.txt'),'file must exists');
+          assert.ok((fs.readFileSync(workingDir+'/test2/my_text file.txt')+'').match(/some content/),
+            'file content must be recorded');
+          done();
+        });
+      var form = r.form();
+      form.append('path', '/test2');
+      form.append('fileName', 'my_text file.txt');
+      form.append('content', 'some content');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/add-note'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          done();
+        });
+      var form = r.form();
+      form.append('fileName', 'my_text file.txt');
+      form.append('content', 'some content');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/add-note'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing fileName param/),'must respond "missing fileName param"');
+          done();
+        });
+      var form = r.form();
+      form.append('path', '/test2');
+      form.append('content', 'some content');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/add-note'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing content param/),'must respond "missing content param"');
+          done();
+        });
+      var form = r.form();
+      form.append('path', '/test2');
+      form.append('fileName', 'my_text file.txt');
     });
   });
 
