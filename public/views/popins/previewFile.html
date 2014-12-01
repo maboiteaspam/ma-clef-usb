@@ -6,12 +6,12 @@
         {{item.size}}
         <br/>
         <audio controls ng-if="getMediaType()=='sound'">
-            <source src="readfile/{{item.path}}"
+            <source src="{{readfilepath}}"
                     type="{{item.contentType}}">
             Your browser does not support the audio element.
         </audio>
         <video controls ng-if="getMediaType()=='video'">
-            <source src="readfile/{{item.path}}"
+            <source src="{{readfilepath}}"
                     type="{{item.contentType}}">
             Your browser does not support the video element.
         </video>
