@@ -33,5 +33,17 @@ angular.module('maClefUsbApp')
         set_items(items);
       }
     });
+    $scope.delete = function(item){
+      $.post("remove",{path:item.path},function(item){
+        $scope.$apply(function(){
+          if( item == 'err'
+            || item == 'not-found' ){
+            $rootScope.$broadcast('showPopin', 'wontBrowse');
+          } else {
+            $rootScope.$broadcast('changePath',$scope.item);
+          }
+        });
+      });
+    };
 
   }]);
