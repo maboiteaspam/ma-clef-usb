@@ -10,11 +10,13 @@ var mime = require('mime');
 var maClefUsb = require('./ma-clef-usb');
 
 var respondErrorCode = function( code, res ){
-  if( code == 'not-found' ){
+  if( code === 'not-found' ){
     res.status(404).send(code)
-  } else if( code == 'not-acceptable' ){
+  } else if( code === 'not-acceptable' ){
     res.status(500).send(code)
-  } else if( code == 'dir-exists' ){
+  } else if( code === 'dir-exists' ){
+    res.status(500).send(code)
+  } else if( code === 'file-exists' ){
     res.status(500).send(code)
   } else {
     return false;
@@ -42,20 +44,25 @@ var controllers = {
   },
   readfile:function(req, res){
     var filePath = req.params[0];
-    maClefUsb.readmeta(filePath,function(item){
-      if(item.type!='file'){
-        res.status(300).send()
-      } else if( !respondErrorCode(item, res) ){
-        var type = item.contentType;
-        if (!res.getHeader('content-type')) {
-          var charset = mime.charsets.lookup(type);
-          res.setHeader('Content-Type', type + (charset ? '; charset=' + charset : ''));
+    if(!filePath){
+      res.status(500).send('missing path param')
+    }else{
+      maClefUsb.readmeta(filePath,function(item){
+        if( respondErrorCode(item, res) ){
+        } else if(item.type!='file'){
+          res.status(500).send('not-a-file')
+        } else {
+          var type = item.contentType;
+          if (!res.getHeader('content-type')) {
+            var charset = mime.charsets.lookup(type);
+            res.setHeader('Content-Type', type + (charset ? '; charset=' + charset : ''));
+          }
+          maClefUsb.readfile(filePath,function(err, stream){
+            stream.pipe(res);
+          });
         }
-        maClefUsb.readfile(filePath,function(err, stream){
-          stream.pipe(res);
-        });
-      }
-    });
+      });
+    }
   },
   download:function(req, res){
     var filePath = req.params[0];
@@ -113,11 +120,11 @@ var controllers = {
   remove:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-      var filePath = fields.filePath;
-      if( ! filePath ){
-        res.status(500).send("missing filePath param")
+      var path = fields.path;
+      if( ! path ){
+        res.status(500).send("missing path param")
       }else{
-        maClefUsb.remove(filePath,function(success){
+        maClefUsb.remove(path,function(success){
           if( !respondErrorCode(success,res) ){
             res.send( success );
           }
@@ -131,6 +138,8 @@ var controllers = {
       var path = fields.path;
       if( ! path ){
         res.status(500).send("missing path param")
+      }else if( ! files.file ){
+        res.status(500).send("missing file param")
       }else{
         maClefUsb.write(path, files.file.name, fs.createReadStream(files.file.path), function(success){
           if( !respondErrorCode(success,res) ){

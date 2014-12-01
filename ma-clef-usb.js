@@ -104,6 +104,8 @@ var api = {
         contentType: mime.lookup(itemPath),
         mtime: stat.mtime
       });
+    }else{
+      done('not-found');
     }
   },
   remove: function(filePath, done){

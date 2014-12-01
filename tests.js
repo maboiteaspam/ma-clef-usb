@@ -53,7 +53,6 @@ describe('maClefUsb', function () {
     });
   });
 
-
   describe('write', function () {
     after(function(){
       fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
@@ -346,7 +345,6 @@ describe('maClefUsb', function () {
     });
   });
 
-
 });
 
 
@@ -361,7 +359,6 @@ describe('Controllers', function () {
     controllers.connect(app);
     app.listen(3000)
   });
-
 
   describe('readdir', function () {
     it('should answer 200', function (done) {
@@ -445,19 +442,257 @@ describe('Controllers', function () {
     it('should answer 200', function (done) {
       var r = request.post({url:'http://localhost:3000/add'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/testupload/),'must respond testupload')
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/testupload/),'must respond testupload');
+          assert.ok(fs.existsSync(workingDir+'testupload.jpg'),'file must exists');
           done();
-      });
+        });
       var form = r.form();
       form.append('path', '/');
       form.append('file',
         fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
         {filename: 'testupload.jpg'});
     });
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/add'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/testupload/),'must respond testupload');
+          assert.ok(fs.existsSync(workingDir+'test2/testupload.jpg'),'file must exists');
+          done();
+        });
+      var form = r.form();
+      form.append('path', 'test2/');
+      form.append('file',
+        fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
+        {filename: 'testupload.jpg'});
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/add'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          done();
+        });
+      var form = r.form();
+      form.append('file',
+        fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
+        {filename: 'testupload.jpg'});
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/add'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing file param/),'must respond "missing file param"');
+          done();
+        });
+      var form = r.form();
+      form.append('path', '/');
+    });
   });
 
+  describe('rename', function () {
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.equal(fs.existsSync(workingDir+'testupload.jpg'),false,'file must not exists');
+          assert.equal(fs.existsSync(workingDir+'text_file'),true,'file must exists');
+          done();
+        });
+      var form = r.form();
+      form.append('oldPath', 'testupload.jpg');
+      form.append('newPath', 'text_file');
+    });
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.equal(fs.existsSync(workingDir+'test2'),false,'file must not exists');
+          assert.equal(fs.existsSync(workingDir+'test3'),true,'file must exists');
+          done();
+        });
+      var form = r.form();
+      form.append('oldPath', 'test2');
+      form.append('newPath', 'test3');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing newPath param/),'must respond "missing newPath param"');
+          done();
+        });
+      var form = r.form();
+      form.append('oldPath', 'test2');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing oldPath param/),'must respond "missing oldPath param"');
+          done();
+        });
+      var form = r.form();
+      form.append('newPath', 'test2');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/file-exists/),'must respond "file-exists"');
+          done();
+        });
+      var form = r.form();
+      form.append('oldPath', 'test3');
+      form.append('newPath', 'text_file');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/rename'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/file-exists/),'must respond "file-exists"');
+          done();
+        });
+      var form = r.form();
+      form.append('oldPath', 'text_file');
+      form.append('newPath', 'test3');
+    });
+  });
+
+  describe('readmeta', function () {
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/readmeta'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/name":"text_file/),'must respond file meta');
+          done();
+        });
+      var form = r.form();
+      form.append('itemPath', 'text_file');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/readmeta'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing itemPath param/),'must respond "missing itemPath param"');
+          done();
+        });
+      var form = r.form();
+    });
+    it('should answer 404', function (done) {
+      var r = request.post({url:'http://localhost:3000/readmeta'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,404,'must respond 404');
+          assert.ok(body.match(/not-found/),'must respond "not-found"');
+          done();
+        });
+      var form = r.form();
+      form.append('itemPath', 'not-a-file');
+    });
+  });
+
+  describe('readfile', function () {
+    it('should answer 200', function (done) {
+      request.get({url:'http://localhost:3000/readfile/text_file'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.ok(body.match(/is is not a picture/),'must respond file content');
+          done();
+        });
+    });
+    it('should answer 404', function (done) {
+      var r = request.get({url:'http://localhost:3000/readfile'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,404,'must respond 404');
+          done();
+        });
+      var form = r.form();
+    });
+    it('should answer 404', function (done) {
+      var r = request.get({url:'http://localhost:3000/readfile/'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,404,'must respond 404');
+          done();
+        });
+      var form = r.form();
+    });
+    it('should answer 500', function (done) {
+      var r = request.get({url:'http://localhost:3000/readfile/test3'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/not-a-file/),'must respond "not-a-file"');
+          done();
+        });
+      var form = r.form();
+    });
+    it('should answer 404', function (done) {
+      var r = request.get({url:'http://localhost:3000/readfile/not-a-file'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,404,'must respond 404');
+          assert.ok(body.match(/not-found/),'must respond "not-found"');
+          done();
+        });
+      var form = r.form();
+      form.append('itemPath', 'not-a-file');
+    });
+  });
+
+  describe.skip('download', function () {
+  });
+
+  describe('remove', function () {
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/remove'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.equal(fs.existsSync(workingDir+'text_file'),false,'file must not exists');
+          done();
+        });
+      var form = r.form();
+      form.append('path', 'text_file');
+    });
+    it('should answer 200', function (done) {
+      var r = request.post({url:'http://localhost:3000/remove'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,200,'must respond 200');
+          assert.equal(fs.existsSync(workingDir+'test3'),false,'directory must not exists');
+          done();
+        });
+      var form = r.form();
+      form.append('path', 'test3');
+    });
+    it('should answer 500', function (done) {
+      var r = request.post({url:'http://localhost:3000/remove'},
+        function optionalCallback(error, response, body) {
+          assert.equal(error,null,'error must be null');
+          assert.equal(response.statusCode,500,'must respond 500');
+          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          done();
+        });
+      var form = r.form();
+    });
+  });
 
 });
 
