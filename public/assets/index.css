@@ -109,3 +109,9 @@ body {
     max-width: 100%;
     display: inline-block;
 }
+.dragover-err{
+    background-color: red;
+}
+.dragover{
+    background-color: green;
+}

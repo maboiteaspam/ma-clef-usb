@@ -11,7 +11,8 @@
 angular
     .module('maClefUsbApp', [
         'angularMoment',
-        'angular-underscore'
+        'angular-underscore',
+        'angularFileUpload'
     ])
   .directive('maxHeight', function() {
 
