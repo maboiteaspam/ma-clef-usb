@@ -6,6 +6,7 @@ var program = require('commander');
 var cozyLight = require('cozy-light');
 var maClefUsb = require('./ma-clef-usb');
 var maClefUsbCozy = require('./cozy');
+var symbols = require('symbolsjs');
 
 var pkg = require('./package.json');
 
@@ -41,27 +42,32 @@ program
       }
       maClefUsb.changeHome(home);
 
-      console.log(pkg.displayName +' started http://localhost:'+port+'/');
-      console.log('ready');
+      console.log('');
+      console.log('\t   http://localhost:'+port+'/');
+      console.log('\t   store location : ' + home);
+      console.log('\t'+symbols.ok+ '  '+pkg.displayName + ' started ');
+      console.log('');
+
       cozyLight.nodeHelpers.clearCloseServer(server);
 
-      readline_toquit(function(){
-        console.log('bye..')
+      readline_toquit('\t   Press enter to leave...\n',function(){
         maClefUsbCozy.stop(function(){
           server.close();
-          process.exit(0)
+          console.log('\t   ..bye!');
+          process.exit(0);
         });
       });
     });
   });
 
 
-function readline_toquit( end_handler ){
+function readline_toquit( message, end_handler ){
+  message = message || '\tPress enter to leave...\n';
 
   var readline = require('readline');
   var rl = readline.createInterface(process.stdin, process.stdout);
 
-  rl.question('Press enter to leave...\n', function(answer) {
+  rl.question(message, function(answer) {
     rl.close();
     if( end_handler != null ){
       end_handler();
