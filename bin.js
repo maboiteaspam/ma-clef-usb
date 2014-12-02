@@ -34,7 +34,6 @@ program
     };
 
 
-    var s;
     maClefUsbCozy.start(opts,function(err, app, server){
 
       if( fs.existsSync(home) == false ){
@@ -43,34 +42,32 @@ program
       maClefUsb.changeHome(home);
 
       console.log(pkg.displayName +' started http://localhost:'+port+'/');
-      console.log('ready')
-      s = server;
+      console.log('ready');
       cozyLight.nodeHelpers.clearCloseServer(server);
-    });
 
-    readline_toquit(function(){
-      console.log('bye..')
-      maClefUsbCozy.stop(function(){
-        s.close();
-        process.exit(0)
+      readline_toquit(function(){
+        console.log('bye..')
+        maClefUsbCozy.stop(function(){
+          server.close();
+          process.exit(0)
+        });
       });
     });
-
-    function readline_toquit( end_handler ){
-
-      var readline = require('readline');
-      var rl = readline.createInterface(process.stdin, process.stdout);
-
-      rl.question('Press enter to leave...\n', function(answer) {
-        rl.close();
-        if( end_handler != null ){
-          end_handler();
-        }
-      });
-    }
-
   });
 
+
+function readline_toquit( end_handler ){
+
+  var readline = require('readline');
+  var rl = readline.createInterface(process.stdin, process.stdout);
+
+  rl.question('Press enter to leave...\n', function(answer) {
+    rl.close();
+    if( end_handler != null ){
+      end_handler();
+    }
+  });
+}
 
 
 // Run CLI
