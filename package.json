@@ -38,6 +38,7 @@
     "mime": "^1.2.11",
     "multiparty": "^4.1.0",
     "path-extra": "0.2.1",
+    "stream-transcoder": "0.0.5",
     "symbolsjs": "maboiteaspam/symbolsjs",
     "vid-streamer": "^1.0.0-alpha2"
   },
