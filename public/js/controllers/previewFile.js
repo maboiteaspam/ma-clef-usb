@@ -41,7 +41,7 @@ angular.module('maClefUsbApp')
           return "picture";
         }else if( ext.match(/(mp3|wav)$/) ){
           return "sound";
-        }else if( ext.match(/(mp4|avi|webm|ogg|ogv)$/) ){
+        }else if( ext.match(/(mp4|avi|webm|ogg|ogv|flv)$/) ){
           return "video";
         }else if( contentType.match(/^(text)/) ){
           return "text";

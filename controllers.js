@@ -4,10 +4,12 @@
 var formidable = require('formidable');
 var multiparty = require('multiparty');
 var vidStreamer = require("vid-streamer");
+var Transcoder = require('stream-transcoder');
 
 var pathExtra = require('path-extra');
 var fs = require('fs-extra');
 var mime = require('mime');
+var url = require('url');
 
 var maClefUsb = require('./ma-clef-usb');
 
@@ -95,9 +97,9 @@ var controllers = {
       if( ! itemPath ){
         res.status(500).send("missing itemPath param")
       }else{
-        maClefUsb.readmeta(itemPath,function(list){
-          if( !respondErrorCode(list,res) ){
-            res.send( list );
+        maClefUsb.readmeta(itemPath,function(meta){
+          if( !respondErrorCode(meta,res) ){
+            res.send( meta );
           }
         });
       }
@@ -158,10 +160,10 @@ var controllers = {
         if (part.filename !== null) {
           if( !file ){
             file = maClefUsb.add(path, part.filename, part);
-            console.log(part.filename+" "+c);
+            //console.log(part.filename+" "+c);
           }else{
             c++;
-            console.log(part.filename+" "+c);
+            //console.log(part.filename+" "+c);
             part.pipe(file);
           }
         }
@@ -228,6 +230,38 @@ var controllers = {
         });
       }
     });
+  },
+  stream:function(req, res,next){
+    var reqUrl = url.parse(req.url, true);
+    var p = reqUrl.pathname || "";
+    p = decodeURIComponent(p);
+    p = p.replace('/stream','');
+    maClefUsb.readmeta(p,function(meta){
+      if( !respondErrorCode(meta,res) ){
+        if(meta.contentType.match(/webm|ogg|mp4$/)){
+          vidStreamer(req,res);
+        }else{
+          try{
+            new Transcoder(maClefUsb.getHome()+"/"+p)
+              .maxSize(320, 240)
+              .videoCodec('h264')
+              .videoBitrate(800 * 1000)
+              .fps(25)
+              .sampleRate(44100)
+              .channels(2)
+              .audioBitrate(128 * 1000)
+              .format('mp4')
+              .on('finish', function() {
+                next();
+              })
+              .stream().pipe(res);
+          }catch(ex){
+            respondErrorCode('not-found',res);
+          }
+        }
+      }
+
+    });
   }
 };
 
@@ -252,6 +286,6 @@ module.exports = {
       "rootPath": "stream/",
       "server": "VidStreamer.js/0.1.4"
     });
-    app.get(/\/stream\/(.+)/, vidStreamer);
+    app.get(/\/stream\/(.+)/, controllers.stream);
   }
 };
