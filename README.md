@@ -35,10 +35,10 @@ cozy-light install maboiteaspam/ma-clef-usb
 ```
 
 ### Run the platform
-browse http://localhost:19104/
 ```
 cozy-light start
 ```
+browse http://localhost:19104/
 
 
 # Install as a stand alone
@@ -48,10 +48,10 @@ npm i maboiteaspam/ma-clef-usb -g
 ```
 
 ### Run the standalone app
-browse http://localhost:8080/
 ```
 ma-clef-usb start [-p 8080] [-h 127.0.0.1] [-H ~/ma-clef-usb]
 ```
+browse http://localhost:8080/
 
 ### Standalone CLI options
 
