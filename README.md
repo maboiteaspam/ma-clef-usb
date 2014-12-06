@@ -15,7 +15,7 @@ what we use to do with usb  stick in old times !
 ### User interface capabilities
 - HTML5 mobile compatible
 - upload / download large files
-- stream compatible mp3/wav/webm/mp4 - ogv can be also, needs patch
+- able to stream mp3/wav/webm/mp4 - ogv can be also, needs patch
 - preview files
 - browse/search your files
 
