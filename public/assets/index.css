@@ -133,3 +133,34 @@ body {
 .drop-box.dragover-err{
     background-color: rgb(164, 23, 23);
 }
+
+.in-progress{
+    text-align: right;
+    font-size: 18px;
+    line-height: 58px;
+}
+.in-progress > div{
+    position: absolute;
+    top: 52px;
+    left: 1px;
+    background-color: white;
+    box-shadow: 0px 0px 19px 0px black;
+}
+.progress {
+    height: 15px;
+    width: 150px;
+    margin: 2px;
+}
+.progress i { line-height: 3.5em; }
+
+.progress-bar {
+    transition: width 1s ease-in-out;
+
+    font-size: 13px;
+    color: black;
+    font-weight: bold;
+    line-height: 16px;
+    white-space: nowrap;
+    text-align: center;
+    padding-left: 2px;
+}

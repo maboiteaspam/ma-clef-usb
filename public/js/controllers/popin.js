@@ -64,16 +64,23 @@ angular.module('maClefUsbApp')
             $scope.$evalAsync(function(){
               if( !s ){
                 $rootScope.$broadcast('showPopin', 'wontBrowse');
-              } else {
-                $rootScope.$broadcast('hidePopin');
               }
             });
           }).progress(function(evt) {
-            console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.file.name);
+            $rootScope.$broadcast('uploadProgress', {
+              filename:evt.config.file.name,
+              lastModifiedDate:evt.config.file.lastModifiedDate,
+              type:evt.config.file.type,
+              percent:parseInt(100.0 * evt.loaded / evt.total),
+              loaded:evt.loaded,
+              total:evt.total
+            });
           }).success(function(data, status, headers, config) {
-            // file is uploaded successfully
-            console.log('file ' + config.file.name + 'is uploaded successfully. Response: ' + data);
+            $rootScope.$broadcast('uploadDone', {
+              filename:config.file.name
+            });
           });
+          $rootScope.$broadcast('hidePopin');
         }
       };
 

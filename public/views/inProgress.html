@@ -1,0 +1,15 @@
+<i class="glyphicon glyphicon-cloud-upload"></i>
+<div confirm-refresh
+     enabled="{{count_progress>0}}"
+     message="There is {{count_progress}} uploads, do you wish to stop and refresh ?">
+    <div class="progress" ng-repeat="item in items_in_progress">
+        <div class="progress-bar  progress-bar-info progress-bar-striped active"
+             role="progressbar"
+             aria-valuenow="{{item.percent}}"
+             aria-valuemin="0" aria-valuemax="100"
+             style="width: {{item.percent}}%">
+            {{item.percent}}% - {{item.filename}}
+        </div>
+    </div>
+
+</div>

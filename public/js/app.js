@@ -45,6 +45,30 @@ angular
       link: link
     };
   })
+  .directive('confirmRefresh', function($timeout) {
+    function link(scope, element, attrs) {
+      var message = attrs.message;
+      var d = false;
+      attrs.$observe('enabled', function(enabled) {
+        d = enabled;
+      });
+      $(window).on('beforeunload', function(e){
+        if( d == "true" ){
+          e = e || window.event;
+          // For IE and Firefox prior to version 4
+          if (e) {
+            e.returnValue = message;
+          }
+          // For others
+          return message + "" +d;
+        }
+      });
+    }
+    return {
+      restrict: 'A',
+      link: link
+    };
+  })
   .directive('clickOnHover', function($timeout) {
     function link(scope, element, attrs) {
       element.on('$destroy', function() {

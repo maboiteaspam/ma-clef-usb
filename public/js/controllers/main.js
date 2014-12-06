@@ -10,6 +10,8 @@
 angular.module('maClefUsbApp')
   .controller('MainCtrl', ['$rootScope','$scope','fsLayer',function ($rootScope, $scope, fsLayer) {
 
+    $scope.count_progress = 0;
+    $scope.items_in_progress = {};
     $scope.breadcrumb = [];
     $scope.dir = {
       path:'/',
@@ -63,6 +65,16 @@ angular.module('maClefUsbApp')
     });
     $rootScope.$on('pathChanged', function(ev, item){
       update_breadcrumb(item.path);
+    });
+    $rootScope.$on('uploadProgress',function(ev,upload){
+      if( ! $scope.items_in_progress[upload.filename] ){
+        $scope.count_progress++;
+      }
+      $scope.items_in_progress[upload.filename] = upload;
+    });
+    $rootScope.$on('uploadDone',function(ev,upload){
+      delete $scope.items_in_progress[upload.filename];
+      $scope.count_progress--;
     });
 
     var update_view = function(){
