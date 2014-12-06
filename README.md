@@ -12,9 +12,12 @@ what we use to do with usb  stick in old times !
 - Put down some notes
 - Browse your files
 
-### User interface compatibility
-- HTML5 compatible
-- mobile compliant
+### User interface capabilities
+- HTML5 mobile compatible
+- upload / download large files
+- stream compatible mp3/wav/webm/mp4 - ogv can be also, needs patch
+- preview files
+- browse/search your files
 
 ### Technical information
 - Server build on top of nodeJS / expressJS
