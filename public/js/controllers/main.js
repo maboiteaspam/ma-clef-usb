@@ -8,9 +8,14 @@
  * Controller of the maClefUsbApp
  */
 angular.module('maClefUsbApp')
-  .controller('MainCtrl', ['$rootScope','$scope',function ($rootScope, $scope) {
+  .controller('MainCtrl', ['$rootScope','$scope','fsLayer',function ($rootScope, $scope, fsLayer) {
 
     $scope.breadcrumb = [];
+    $scope.dir = {
+      path:'/',
+      type:'folder',
+      name:'home'
+    };
 
     var update_breadcrumb = function(path){
       $scope.breadcrumb = [];
@@ -24,7 +29,7 @@ angular.module('maClefUsbApp')
         }
         $scope.breadcrumb.push({
           name:path_item==''?'home':path_item,
-          path:c_path,
+          path:path_item==''?'/':c_path,
           active:false,
           type:'folder',
           ext:'',
@@ -34,10 +39,9 @@ angular.module('maClefUsbApp')
       _($scope.breadcrumb).last().active = true;
     };
     var change_item = function(item){
-      $.post("readdir",{dirPath:item.path},function(items){
+      fsLayer.readdir(item.path,function(s,items){
         $scope.$apply(function(){
-          if( items == 'err'
-            || items == 'not-found' ){
+          if( !s ){
             $rootScope.$broadcast('showPopin', 'wontBrowse');
           } else {
             $rootScope.$broadcast('pathChanged', item, items);
@@ -49,31 +53,37 @@ angular.module('maClefUsbApp')
     $rootScope.$on('changePath', function(ev,item){
       if( item.type != 'file' ){
         change_item(item);
+        $scope.dir = item;
       } else {
         $rootScope.$broadcast('previewPath', item);
       }
+    });
+    $rootScope.$on('refresh', function(ev){
+      $rootScope.$broadcast('changePath', $scope.dir);
     });
     $rootScope.$on('pathChanged', function(ev, item){
       update_breadcrumb(item.path);
     });
 
-    var current_path = "/";
-    if( window.location.hash ){
-      current_path = window.location.hash.match(/#(.+)/)[1];
-      current_path = decodeURI(current_path);
-    }
-    $.post("readmeta",{itemPath:current_path},function(item){
-      $scope.$apply(function(){
-        if( item == 'err'
-          || item == 'not-found' ){
-          $rootScope.$broadcast('showPopin', 'wontBrowse');
-          update_breadcrumb(current_path);
-        } else {
-          if( item.type == 'file' ){
-            change_item({path:item.path.replace(item.name,'')});
+    var update_view = function(){
+      var current_path = "/";
+      if( window.location.hash ){
+        current_path = window.location.hash.match(/#(.+)/)[1];
+        current_path = decodeURI(current_path);
+      }
+      fsLayer.get(current_path,function(item){
+        $scope.$apply(function(){
+          if(!item){
+            $rootScope.$broadcast('showPopin', 'wontBrowse');
+            update_breadcrumb(current_path);
+          }else{
+            if( item.type == 'file' ){
+              $rootScope.$broadcast('changePath', {path:item.dirname});
+            }
+            $rootScope.$broadcast('changePath', item);
           }
-          change_item(item);
-        }
+        });
       });
-    });
+    };
+    update_view();
   }]);

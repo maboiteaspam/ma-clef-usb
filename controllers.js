@@ -2,6 +2,8 @@
 
 
 var formidable = require('formidable');
+var multiparty = require('multiparty');
+var vidStreamer = require("vid-streamer");
 
 var pathExtra = require('path-extra');
 var fs = require('fs-extra');
@@ -34,6 +36,7 @@ var controllers = {
   readdir:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var dirPath = fields.dirPath || '/';
       maClefUsb.readdir(dirPath,function(list){
         if( !respondErrorCode(list,res) ){
@@ -87,6 +90,7 @@ var controllers = {
   readmeta:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var itemPath = fields.itemPath;
       if( ! itemPath ){
         res.status(500).send("missing itemPath param")
@@ -102,6 +106,7 @@ var controllers = {
   rename:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var oldPath = fields.oldPath;
       var newPath = fields.newPath;
       if( ! oldPath ){
@@ -120,6 +125,7 @@ var controllers = {
   remove:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var path = fields.path;
       if( ! path ){
         res.status(500).send("missing path param")
@@ -133,25 +139,58 @@ var controllers = {
     });
   },
   add:function(req, res){
-    var form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files) {
-      var path = fields.path;
-      if( ! path ){
+    var form = new multiparty.Form();
+    form.on('error', function(err) {
+      console.log('Error parsing form: ' + err.stack);
+    });
+    var path;
+    var file;
+    var c=0;
+    form.on('field', function(name, value) {
+      if (name === 'path') {
+        path = value;
+      }
+    });
+    form.on('part', function(part) {
+      if( !path ){
         res.status(500).send("missing path param")
-      }else if( ! files.file ){
+      }else{
+        if (part.filename !== null) {
+          if( !file ){
+            file = maClefUsb.add(path, part.filename, part);
+            console.log(part.filename+" "+c);
+          }else{
+            c++;
+            console.log(part.filename+" "+c);
+            part.pipe(file);
+          }
+        }
+      }
+      part.on('error', function(err) {
+        res.status(500).send(err)
+      });
+    });
+
+// Close emitted after form parsed
+    form.on('close', function() {
+      if( !file ){
         res.status(500).send("missing file param")
       }else{
-        maClefUsb.add(path, files.file.name, fs.createReadStream(files.file.path), function(success){
+        maClefUsb.readdir(path, function(success){
           if( !respondErrorCode(success,res) ){
             res.send( success );
           }
         });
       }
     });
+
+// Parse req
+    form.parse(req);
   },
   addNote:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var path = fields.path;
       var fileName = fields.fileName;
       var content = fields.content;
@@ -173,6 +212,7 @@ var controllers = {
   addDir:function(req, res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
+      if( err ) throw err;
       var dirPath = fields.dirPath;
       if( ! dirPath ){
         res.status(500).send("missing dirPath param")
@@ -204,5 +244,14 @@ module.exports = {
     app.post('/add-note', controllers.addNote);
     app.post('/add-dir', controllers.addDir);
     app.post('/add', controllers.add);
+    vidStreamer.settings({
+      "mode": "development",
+      "forceDownload": false,
+      "random": false,
+      "rootFolder": maClefUsb.getHome(),
+      "rootPath": "stream/",
+      "server": "VidStreamer.js/0.1.4"
+    });
+    app.get(/\/stream\/(.+)/, vidStreamer);
   }
 };

@@ -16,23 +16,24 @@
                 <label class="col-sm-2 control-label">Drop files</label>
                 <div class="col-sm-10">
 
-                    <div ng-file-drop ng-model="files" class="drop-box"
+                    <div ng-file-drop
+                         ng-model="files"
+                         ng-file-change="fileDropped($files, $event, $rejectedFiles)"
+                         class="bg-info drop-box"
                          drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}"
-                         multiple="false" allow-dir="false" accept="*">
-                        Drop Images or PDFs files here
+                         multiple="false"
+                         allow-dir="false"
+                            >
+                        Drop files here
                     </div>
                     <div ng-no-file-drop>
-                        <button ng-file-select ng-model="files" multiple="false">Attach Any File</button>
+                        <button ng-file-select
+                                ng-model="files"
+                                multiple="false"
+                                >Attach Any File</button>
                     </div>
                 </div>
 
-            </div>
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit"
-                            ng-click="createFile(dir.path)"
-                            class="btn btn-default">Create</button>
-                </div>
             </div>
         </form>
 

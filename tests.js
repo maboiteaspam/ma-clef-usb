@@ -235,9 +235,11 @@ describe('maClefUsb', function () {
         assert.ok(items.length>1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
-          'response is missing new file');
+          'name is wrong');
         assert.equal(items[0].path, '/test.jpeg',
-          'response is missing new file');
+          'path is wrong');
+        assert.equal(items[0].dirname, '/',
+          'dirname is wrong');
         done();
       });
     });
@@ -269,6 +271,8 @@ describe('maClefUsb', function () {
           'name is wrong');
         assert.equal(meta.path, '/test.jpeg',
           'path is wrong');
+        assert.equal(meta.dirname, '/',
+          'dirname is wrong');
         done();
       });
     });
@@ -405,7 +409,7 @@ describe('Controllers', function () {
         function optionalCallback(error, response, body) {
           assert.equal(error,null,'error must be null')
           assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/path":"\/test2","name":"test2"/),'must respond items')
+          assert.ok(body.match(/path":"\/test2","dirname":"\/","name":"test2"/),'must respond items')
           done();
         });
     });
@@ -440,7 +444,18 @@ describe('Controllers', function () {
 
   describe('add', function () {
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/add'},
+      var formData = {
+        // Pass a simple key-value pair
+        path: '/',
+        custom_file: {
+          value:  fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
+          options: {
+            filename: 'testupload.jpg',
+            contentType: 'image/jpg'
+          }
+        }
+      };
+      var r = request.post({url:'http://localhost:3000/add', formData: formData},
         function optionalCallback(error, response, body) {
           assert.equal(error,null,'error must be null');
           assert.equal(response.statusCode,200,'must respond 200');
@@ -448,11 +463,6 @@ describe('Controllers', function () {
           assert.ok(fs.existsSync(workingDir+'testupload.jpg'),'file must exists');
           done();
         });
-      var form = r.form();
-      form.append('path', '/');
-      form.append('file',
-        fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
-        {filename: 'testupload.jpg'});
     });
     it('should answer 200', function (done) {
       var r = request.post({url:'http://localhost:3000/add'},

@@ -12,7 +12,7 @@
                ng-click="$root.$broadcast('changePath', item);"
                 >{{item.name}}</a>
         </td>
-        <td class="size">{{item.size}}</td>
+        <td class="size">{{size(item.size)}}</td>
         <td>
             <a href="download/{{item.path}}"
                target="_blank"

@@ -4,7 +4,7 @@ var fs = require('fs-extra');
 var pathExtra = require('path-extra');
 var glob = require("glob");
 var mime = require('mime');
-var Stream = require('stream')
+var Stream = require('stream');
 
 var storagePath = '';
 
@@ -17,6 +17,23 @@ var relativePath = function(p){
 
 var isAcceptablePath = function(p){
   return !!p.match(new RegExp("^"+storagePath));
+};
+
+var forgeFileMeta = function(f){
+  if( fs.existsSync(f) ){
+    var stat = fs.lstatSync( f );
+    var d = pathExtra.dirname(f.replace(storagePath,''));
+    return {
+      type: stat.isFile()?'file':'folder',
+      path: pathExtra.join('/',pathExtra.relative(storagePath, f)),
+      dirname: d==="." ? '/' : d,
+      name: pathExtra.basename(f),
+      ext: pathExtra.extname(f),
+      size: stat.size,
+      contentType: mime.lookup(f),
+      mtime: stat.mtime
+    };
+  }
 };
 
 var api = {
@@ -53,16 +70,7 @@ var api = {
         var items = [];
         files.forEach(function(file){
           var filePath = pathExtra.join(rstoreFilePath, file);
-          var stat = fs.lstatSync( filePath );
-          items.push({
-            type: stat.isFile()?'file':'folder',
-            path: pathExtra.join('/',pathExtra.relative(storagePath, rstoreFilePath),file),
-            name: file,
-            ext: pathExtra.extname(file),
-            size: stat.size,
-            contentType: mime.lookup(filePath),
-            mtime: stat.mtime
-          })
+          items.push(forgeFileMeta(filePath))
         });
         done(items);
       });
@@ -74,19 +82,9 @@ var api = {
     itemPath = relativePath( itemPath );
     if(!isAcceptablePath(itemPath) ){
       done("not-acceptable")
-    }else if( fs.existsSync(itemPath) ){
-      var stat = fs.lstatSync( itemPath );
-      return done({
-        type: stat.isFile()?'file':'folder',
-        path: pathExtra.join('/',pathExtra.relative(storagePath, itemPath)),
-        name: pathExtra.basename(itemPath),
-        ext: pathExtra.extname(itemPath),
-        size: stat.size,
-        contentType: mime.lookup(itemPath),
-        mtime: stat.mtime
-      });
     }else{
-      done('not-found');
+      var meta = forgeFileMeta(itemPath);
+      done(meta?meta:'not-found');
     }
   },
   remove: function(filePath, done){
@@ -118,14 +116,10 @@ var api = {
       if( file instanceof Stream.Readable ){
         var fstream = fs.createWriteStream( rstoreFilePath );
         file.pipe(fstream);
-        file.on('readable', function() {
-          var chunk;
-          while (null !== (chunk = file.read())) {
-          }
-        });
         file.on('close', function () {
           api.readdir(storePath, done);
         });
+        return fstream;
       } else {
         fs.writeFileSync(rstoreFilePath, file);
         api.readdir(storePath, done);
@@ -141,6 +135,9 @@ var api = {
       storagePath = pathExtra.resolve(newPath);
       if( done ) done(true)
     }
+  },
+  getHome: function(){
+    return storagePath;
   }
 };
 

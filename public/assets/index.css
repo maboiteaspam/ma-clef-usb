@@ -115,3 +115,21 @@ body {
 .dragover{
     background-color: green;
 }
+.drop-box{
+    height: 96px;
+    padding-top: 0;
+    line-height: 96px;
+    text-align: center;
+    font-size: 130%;
+    border-style: dashed;
+    border-color: white;
+    border-width: 6px;
+    transition-duration: .5s;
+    transition-property: background-color;
+}
+.drop-box.dragover{
+    background-color: rgba(21, 176, 4, 0.52);
+}
+.drop-box.dragover-err{
+    background-color: rgb(164, 23, 23);
+}

@@ -8,22 +8,17 @@
  * Controller of the maClefUsbApp
  */
 angular.module('maClefUsbApp')
-  .controller('PopinCtrl', ['$scope', '$rootScope',
-    function ($scope, $rootScope) {
+  .controller('PopinCtrl', ['$scope', '$rootScope','fsLayer',
+    function ($scope, $rootScope, fsLayer) {
+      $scope.files = [];
       $scope.name = '';
       $scope.dir = {};
       $scope.item = {};
-      $scope.readfilepath = "readfile/"; // required to pass angularjs@sce
-      $rootScope.$on('changePath', function(ev,item){
-        $scope.item = item;
-        $scope.readfilepath = "readfile/"+item.path;
-        if( item.type == 'folder' ){
-          $scope.dir = item;
-        }
-      });
+      $scope.readfilepath = "#"; // required to pass angularjs@sce
+
       $rootScope.$on('pathChanged', function(ev,item){
         $scope.item = item;
-        $scope.readfilepath = "readfile/"+item.path;
+        $scope.readfilepath = "readfile/"+(item.path+'');
         if( item.type == 'folder' ){
           $scope.dir = item;
         }
@@ -33,37 +28,53 @@ angular.module('maClefUsbApp')
       });
       $rootScope.$on('hidePopin', function(ev) {
         $scope.name = '';
+        $scope.dir = {};
+        $rootScope.$broadcast('refresh');
       });
       $rootScope.createNote = function(inpath,fileName,content) {
-        $.post("add-note",{path:inpath,fileName:fileName,content:content},function(item){
+        fsLayer.addNote(inpath,fileName,content,function(s,item){
           $scope.$apply(function(){
-            if( item == 'err'
-              || item == 'not-found'
-              || item == 'dir-exists'
-              || item == 'file-exists' ){
+            if( !s ){
               $rootScope.$broadcast('showPopin', 'wontBrowse');
             } else {
-              $rootScope.$broadcast('changePath',$scope.dir);
               $rootScope.$broadcast('hidePopin');
             }
           });
         });
       };
       $rootScope.createFolder = function(inpath,folderName) {
-        $.post("add-dir",{dirPath:inpath+'/'+folderName},function(item){
+        fsLayer.addDir(inpath+'/'+folderName,function(s,item){
           $scope.$apply(function(){
-            if( item == 'err'
-              || item == 'not-found'
-              || item == 'dir-exists' ){
+            if( !s ){
               $rootScope.$broadcast('showPopin', 'wontBrowse');
             } else {
-              $rootScope.$broadcast('changePath',$scope.dir);
               $rootScope.$broadcast('hidePopin');
             }
           });
         });
       };
-      $rootScope.createFile = function() {
-        $rootScope.$on('changePath',$scope.dir);
+
+      $scope.fileDropped = function($files) {
+        for (var i = 0; i < $files.length; i++) {
+          var file = $files[i];
+          if(!$scope.dir.path){
+            //debugger;
+          }
+          $scope.upload = fsLayer.add($scope.dir.path,file,function(s){
+            $scope.$evalAsync(function(){
+              if( !s ){
+                $rootScope.$broadcast('showPopin', 'wontBrowse');
+              } else {
+                $rootScope.$broadcast('hidePopin');
+              }
+            });
+          }).progress(function(evt) {
+            console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.file.name);
+          }).success(function(data, status, headers, config) {
+            // file is uploaded successfully
+            console.log('file ' + config.file.name + 'is uploaded successfully. Response: ' + data);
+          });
+        }
       };
+
     }]);
