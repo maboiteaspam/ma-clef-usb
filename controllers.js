@@ -236,9 +236,18 @@ var controllers = {
     var p = reqUrl.pathname || "";
     p = decodeURIComponent(p);
     p = p.replace('/stream','');
+    p = p.match(/^[/]/)?p:"/"+p;
     maClefUsb.readmeta(p,function(meta){
       if( !respondErrorCode(meta,res) ){
         if(meta.contentType.match(/webm|ogg|mp4$/)){
+          vidStreamer.settings({
+            "mode": "development",
+            "forceDownload": false,
+            "random": false,
+            "rootFolder": maClefUsb.getHome()+"/",
+            "rootPath": "stream/",
+            "server": "VidStreamer.js/0.1.4"
+          });
           vidStreamer(req,res);
         }else{
           try{
@@ -278,14 +287,6 @@ module.exports = {
     app.post('/add-note', controllers.addNote);
     app.post('/add-dir', controllers.addDir);
     app.post('/add', controllers.add);
-    vidStreamer.settings({
-      "mode": "development",
-      "forceDownload": false,
-      "random": false,
-      "rootFolder": maClefUsb.getHome(),
-      "rootPath": "stream/",
-      "server": "VidStreamer.js/0.1.4"
-    });
     app.get(/\/stream\/(.+)/, controllers.stream);
   }
 };

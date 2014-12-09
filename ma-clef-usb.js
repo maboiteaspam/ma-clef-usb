@@ -108,7 +108,7 @@ var api = {
     }
   },
   add: function(storePath, fileName, file, done){
-    var astorePath = relativePath(storePath);
+    var astorePath = relativePath(storePath)+'/';
     if(!isAcceptablePath(astorePath) ){
       done("not-acceptable")
     }else if( fs.existsSync(astorePath) ){

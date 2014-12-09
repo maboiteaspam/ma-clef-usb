@@ -43,12 +43,12 @@
     "vid-streamer": "^1.0.0-alpha2"
   },
   "devDependencies": {
-    "request": "^2.49.0"
+    "request": "^2.49.0",
+    "zombie": "^2.5.1"
   },
   "scripts": {
-    "test": "mocha --globals s --reporter spec tests.js",
-    "integration": "mocha --globals s --reporter spec integration.js",
-    "lint": "eslint index.js tests.js"
+    "test": "mocha --globals s --reporter spec",
+    "lint": "eslint index.js tests/tests.js tests/integration.js"
   },
   "repository": {
     "type": "git",

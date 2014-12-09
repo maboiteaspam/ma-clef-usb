@@ -5,11 +5,13 @@ var express = require('express');
 var request = require('request');
 var assert = require('assert');
 
-var maClefUsb = require('./ma-clef-usb');
-var controllers = require('./controllers');
+var maClefUsb = require('../ma-clef-usb');
+var controllers = require('../controllers');
 
-var workingDir = pathExtra.join( __dirname, '/.test-working_dir/');
-var fixturesDir = pathExtra.join( __dirname, '/fixtures/');
+var workingDir = pathExtra.join( __dirname, '/../.test-working_dir/');
+var fixturesDir = pathExtra.join( __dirname, '/../fixtures/');
+workingDir = pathExtra.resolve(workingDir)+'/';
+fixturesDir = pathExtra.resolve(fixturesDir)+'/';
 
 before(function(){
   fs.removeSync(workingDir);
@@ -64,8 +66,9 @@ describe('maClefUsb', function () {
       maClefUsb.add(storePath,fileName,fstream,function(items){
         assert.notEqual(items, 'not-found',
           'wrong storePath');
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
-          'did not write file');
+        var target_path = pathExtra.join(workingDir,storePath,fileName);
+        assert(fs.existsSync(target_path),
+          'did not write file '+target_path);
         done();
       });
     });
