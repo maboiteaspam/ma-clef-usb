@@ -15,10 +15,9 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">Drop files</label>
                 <div class="col-sm-10">
-
                     <div ng-file-drop
                          ng-model="files"
-                         ng-file-change="fileDropped($files, $event, $rejectedFiles)"
+                         ng-file-change="fileDropped($files, $event, $rejectedFiles, $scope.dir)"
                          class="bg-info drop-box"
                          drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}"
                          multiple="false"

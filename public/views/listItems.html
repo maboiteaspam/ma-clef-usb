@@ -1,4 +1,3 @@
-
 <table class="table table-condensed table-hover table-striped list-items">
     <tr>
         <th>Name</th>
@@ -6,7 +5,17 @@
         <th>Dl</th>
         <th>Rm</th>
     </tr>
-    <tr ng-repeat="item in items">
+    <tr ng-repeat="item in items"
+        split-drag-over
+        drop="{{item.type=='file'?'after':'in'}}"
+
+        ng-file-drop
+        ng-model="files"
+        ng-file-change="fileDropped($files, $event, $rejectedFiles, item.type=='file'?dir:item)"
+        drag-over-class="{accept:'', reject:'', delay:100}"
+        multiple="false"
+        allow-dir="false"
+            >
         <td>
             <a href="#{{item.path}}"
                ng-click="$root.$broadcast('changePath', item);"

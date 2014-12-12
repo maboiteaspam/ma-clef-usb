@@ -14,6 +14,13 @@ angular.module('maClefUsbApp')
     // see
     // http://html5demos.com/dnd-upload#view-source
 
+    $scope.dir = {
+      type:'folder',
+      path:'/',
+      name:'home',
+      ext:'',
+      size:''
+    };
     $scope.item = {
       type:'folder',
       path:'/',
@@ -40,15 +47,15 @@ angular.module('maClefUsbApp')
         u = 'tb';
         s = s/1024;
       }
-      return Math.round(s)+''+u;
+      return Math.round(s)+' '+u;
     };
     var set_items = function(items){
       $scope.items = $filter('orderBy')(items, ['-type','name']);
     };
     $rootScope.$on('pathChanged', function(ev, item, items){
       $scope.item = item;
-      if( item.type == 'file' ){
-      } else if(items){
+      if( item.type == 'folder' ){
+        $scope.dir = item;
         set_items(items);
       }
     });

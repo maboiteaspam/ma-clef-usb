@@ -14,6 +14,68 @@ angular
         'angular-underscore',
         'angularFileUpload'
     ])
+  .directive('splitDragOver', function($timeout) {
+    function link(scope, element, attrs) {
+      element.on('$destroy', function() {
+      });
+
+      var inDragEnter = function(){
+        element.addClass('drag-in');
+      };
+      var inDragLeave = function(){
+        element.removeClass('drag-in');
+      };
+
+      var afterDragEnter = function(){
+        if( ! element.next().hasClass('drop_el') ){
+          var n = element[0].nodeName.toLowerCase();
+          var drop_el = $("<"+n+">").addClass('drop_el');
+          if( n == 'tr' ){
+            element.children().each(function(k,v){
+              drop_el.append(
+                $('<td>').addClass($(v).attr('class'))
+              );
+            });
+          }
+          element.after(drop_el);
+          setTimeout(function(){drop_el.addClass('in');},10)
+        }else{
+          element.next().addClass('in');
+          element.next().removeClass('out');
+        }
+      };
+      var afterDragLeave = function(){
+        if( element.next().hasClass('drop_el') ){
+          var drop_el = element.next();
+          drop_el.removeClass('in');
+          drop_el.addClass('out');
+          $timeout(function(){
+            if( drop_el.hasClass("out") ){
+              drop_el.removeClass('out');
+            }
+          },750)
+        }
+      };
+
+      scope.$watch(attrs.drop, function(value){
+        if( attrs.drop == 'in' ){
+          element[0].removeEventListener('dragenter', afterDragEnter);
+          element[0].removeEventListener('dragleave', afterDragLeave);
+          element[0].addEventListener('dragenter', inDragEnter, false);
+          element[0].addEventListener('dragleave', inDragLeave, false);
+        } else {
+          element[0].removeEventListener('dragenter', inDragEnter);
+          element[0].removeEventListener('dragleave', inDragLeave);
+          element[0].addEventListener('dragenter', afterDragEnter, false);
+          element[0].addEventListener('dragleave', afterDragLeave, false);
+        }
+      });
+    }
+    return {
+      restrict: 'A',
+      link: link
+    };
+  })
   .directive('maxHeight', function() {
 
     function link(scope, element, attrs) {
@@ -45,7 +107,7 @@ angular
       link: link
     };
   })
-  .directive('confirmRefresh', function($timeout) {
+  .directive('confirmRefresh', function() {
     function link(scope, element, attrs) {
       var message = attrs.message;
       var d = false;
@@ -69,7 +131,7 @@ angular
       link: link
     };
   })
-  .directive('clickOnHover', function($timeout) {
+  .directive('clickOnHover', function() {
     function link(scope, element, attrs) {
       element.on('$destroy', function() {
         element.off('mouseenter');

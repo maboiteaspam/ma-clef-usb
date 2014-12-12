@@ -164,3 +164,27 @@ body {
     text-align: center;
     padding-left: 2px;
 }
+
+
+.drop_el{
+}
+.drag-in td{
+    background-color: #00b3ee !important;
+}
+.drop_el td{
+    border-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    height: 0;
+    background-color: #00b3ee !important;
+    transition-property: height;
+    transition-duration:750ms;
+}
+.drop_el.in td{
+    height: 20px;
+}
+.drop_el.out td{
+    height: 0;
+}

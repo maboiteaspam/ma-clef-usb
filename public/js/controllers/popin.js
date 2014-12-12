@@ -10,7 +10,6 @@
 angular.module('maClefUsbApp')
   .controller('PopinCtrl', ['$scope', '$rootScope','fsLayer',
     function ($scope, $rootScope, fsLayer) {
-      $scope.files = [];
       $scope.name = '';
       $scope.dir = {};
       $scope.item = {};
@@ -53,14 +52,13 @@ angular.module('maClefUsbApp')
           });
         });
       };
-
-      $scope.fileDropped = function($files) {
+      $rootScope.fileDropped = function($files, $event, $rej, $dir) {
+        console.log($rej)
+        console.log($dir)
+        if( !$dir || $dir.type !== 'folder' ) throw "must be directory";
         for (var i = 0; i < $files.length; i++) {
           var file = $files[i];
-          if(!$scope.dir.path){
-            //debugger;
-          }
-          $scope.upload = fsLayer.add($scope.dir.path,file,function(s){
+          $scope.upload = fsLayer.add($dir.path,file,function(s){
             $scope.$evalAsync(function(){
               if( !s ){
                 $rootScope.$broadcast('showPopin', 'wontBrowse');
@@ -79,6 +77,7 @@ angular.module('maClefUsbApp')
             $rootScope.$broadcast('uploadDone', {
               filename:config.file.name
             });
+            $rootScope.$broadcast('refresh');
           });
           $rootScope.$broadcast('hidePopin');
         }

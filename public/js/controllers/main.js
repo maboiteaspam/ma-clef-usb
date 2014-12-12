@@ -90,7 +90,7 @@ angular.module('maClefUsbApp')
             update_breadcrumb(current_path);
           }else{
             if( item.type == 'file' ){
-              $rootScope.$broadcast('changePath', {path:item.dirname});
+              $rootScope.$broadcast('changePath', {path:item.dirname,type:'folder'});
             }
             $rootScope.$broadcast('changePath', item);
           }
