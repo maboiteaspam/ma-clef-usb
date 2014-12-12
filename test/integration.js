@@ -15,7 +15,7 @@ fixturesDir = pathExtra.resolve(fixturesDir)+'/';
 before(function(done){
   this.timeout(50000);
   cozyLight.configHelpers.init(workingDir, {});
-  cozyLight.actions.start({},function(){
+  cozyLight.actions.start({noExpressLog:true},function(){
     cozyLight.actions.installApp(__dirname+'/../',function(){
       done();
     })
@@ -33,9 +33,17 @@ describe('ma Clef USB', function () {
 
 // Browser instance for this test
       var browser = Browser.create();
-      browser.visit('/apps/ma-clef-usb/', function() {
+      browser.visit('/apps/ma-clef-usb/',function() {
         browser.assert.url('http://localhost:19104/apps/ma-clef-usb/');
-        done();
+        var s = browser.query(".add-items "); // Uncaught AssertionError: No target element (note: call with selector/element, event name and callback)
+        console.error(s) // null
+        console.error(s) // null
+        browser.click(".add-items .dropdown-toggle", function(e, browser, status) {
+          browser.click(".add-items ul > li:nth-child(3) > a", function(e, browser, status) {
+            browser.assert.url('http://localhost:19104/apps/ma-clef-usb/');
+            done();
+          });
+        });
       });
 
     });
