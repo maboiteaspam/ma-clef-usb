@@ -47,8 +47,7 @@
     "zombie": "^2.5.1"
   },
   "scripts": {
-    "test": "mocha --globals s --reporter spec -b",
-    "integration": "mocha --globals s --reporter spec -b test/integration.js",
+    "test": "mocha --globals s --reporter spec",
     "lint": "eslint index.js tests/tests.js tests/integration.js"
   },
   "repository": {

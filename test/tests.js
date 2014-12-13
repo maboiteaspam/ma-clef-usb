@@ -13,19 +13,23 @@ var fixturesDir = pathExtra.join( __dirname, '/../fixtures/');
 workingDir = pathExtra.resolve(workingDir)+'/';
 fixturesDir = pathExtra.resolve(fixturesDir)+'/';
 
-before(function(){
-  fs.removeSync(workingDir);
-  fs.mkdirSync(workingDir);
-  maClefUsb.changeHome(workingDir);
-});
-
-
-after(function(){
-  fs.removeSync(workingDir);
-});
 
 
 describe('maClefUsb', function () {
+
+
+  before(function(){
+    fs.removeSync(workingDir);
+    fs.mkdirSync(workingDir);
+    maClefUsb.changeHome(workingDir);
+  });
+
+
+  after(function(){
+    fs.removeSync(workingDir);
+  });
+
+
 
   describe('addDir', function () {
     after(function(){
@@ -365,6 +369,9 @@ describe('Controllers', function () {
     app = express();
     controllers.connect(app);
     app.listen(3000)
+  });
+  after(function(){
+    fs.removeSync(workingDir);
   });
 
   describe('readdir', function () {
