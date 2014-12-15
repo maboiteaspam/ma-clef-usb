@@ -10,8 +10,8 @@ var controllers = require('../controllers');
 
 var workingDir = pathExtra.join( __dirname, '/../.test-working_dir/');
 var fixturesDir = pathExtra.join( __dirname, '/../fixtures/');
-workingDir = pathExtra.resolve(workingDir)+'/';
-fixturesDir = pathExtra.resolve(fixturesDir)+'/';
+workingDir = pathExtra.resolve(workingDir) + '/';
+fixturesDir = pathExtra.resolve(fixturesDir) + '/';
 
 
 
@@ -33,26 +33,27 @@ describe('maClefUsb', function () {
 
   describe('addDir', function () {
     after(function(){
-      fs.rmdirSync( pathExtra.join(workingDir,'/test2') );
+      fs.rmdirSync( pathExtra.join(workingDir, '/test2') );
     });
     it(' should work', function (done) {
-      maClefUsb.addDir('/test2',function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,'/test2')),
+      maClefUsb.addDir('/test2', function(){
+        assert(fs.existsSync(pathExtra.join(workingDir, '/test2')),
           'did not create dir');
         done();
       });
     });
     it(' should not create directory outside home directory', function (done) {
-      maClefUsb.addDir('../test2',function(err){
-        assert.equal(fs.existsSync(pathExtra.join(workingDir,'..','test2')), false,
+      maClefUsb.addDir('../test2', function(err){
+        var p = pathExtra.join(workingDir, '..', 'test2');
+        assert.equal(fs.existsSync(p), false,
           'must not create directory');
-        assert.equal(err,"not-acceptable",'must return correct answer');
+        assert.equal(err, 'not-acceptable', 'must return correct answer');
         done();
       });
     });
     it(' should not create directory outside home directory', function (done) {
-      maClefUsb.addDir('/../test4',function(){
-        assert.equal(fs.existsSync(pathExtra.join(workingDir,'test4')), true,
+      maClefUsb.addDir('/../test4', function(){
+        assert.equal(fs.existsSync(pathExtra.join(workingDir, 'test4')), true,
           'must create directory inside home');
         done();
       });
@@ -61,27 +62,27 @@ describe('maClefUsb', function () {
 
   describe('add', function () {
     after(function(){
-      fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
+      fs.unlinkSync( pathExtra.join(workingDir, '/test.jpeg') );
     });
     it('should write file', function (done) {
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath,fileName,fstream, function(items){
         assert.notEqual(items, 'not-found',
           'wrong storePath');
-        var target_path = pathExtra.join(workingDir,storePath,fileName);
-        assert(fs.existsSync(target_path),
-          'did not write file '+target_path);
+        var targetPath = pathExtra.join(workingDir,storePath,fileName);
+        assert(fs.existsSync(targetPath),
+          'did not write file ' + targetPath);
         done();
       });
     });
     it('should answer readdir', function (done) {
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(items){
-        assert.ok(items.length>1,
+      maClefUsb.add(storePath,fileName, fstream, function(items){
+        assert.ok(items.length > 1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
           'name is wrong');
@@ -91,38 +92,39 @@ describe('maClefUsb', function () {
       });
     });
     it('should not write file in a non existent directory', function (done) {
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/test3';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath, fileName, fstream, function(items){
         assert.equal(items, 'not-found',
           'wrong storePath');
         done();
       });
     });
     it('should write another file', function (done) {
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/test3';
       var fileName = 'test5.jpeg';
-      maClefUsb.addDir(storePath,function(){
-        maClefUsb.add(storePath,fileName,fstream,function(items){
+      maClefUsb.addDir(storePath, function(){
+        maClefUsb.add(storePath, fileName, fstream, function(items){
           assert.notEqual(items, 'not-found',
             'wrong storePath');
-          assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+          assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
             'did not copy file');
-          fs.unlinkSync( pathExtra.join(workingDir,'/test3/test5.jpeg') );
-          fs.rmdirSync( pathExtra.join(workingDir,'/test3') );
+          fs.unlinkSync( pathExtra.join(workingDir, '/test3/test5.jpeg') );
+          fs.rmdirSync( pathExtra.join(workingDir, '/test3') );
           done();
         });
       });
     });
     it('should not write file outside home directory', function (done) {
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '../';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(items){
+      maClefUsb.add(storePath, fileName, fstream, function(items){
         assert.equal(items, 'not-acceptable', 'wrong storePath');
-        assert.equal(fs.existsSync(pathExtra.join(workingDir,storePath,'../',fileName)), false,
+        var p = pathExtra.join(workingDir,storePath, '../', fileName);
+        assert.equal(fs.existsSync(p), false,
           'must not write file');
         done();
       });
@@ -131,49 +133,51 @@ describe('maClefUsb', function () {
 
   describe('rename', function () {
     before(function(done){
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+      maClefUsb.add(storePath, fileName, fstream, function(){
+        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
           'did not copy file');
-        fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+        fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
         var fileName2 = 'test22.jpeg';
-        maClefUsb.add(storePath,fileName2,fstream,function(){
-          assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName2)),
+        maClefUsb.add(storePath, fileName2, fstream, function(){
+          assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName2)),
             'did not copy file');
           done();
         });
       });
     });
     after(function(){
-      try{
-        fs.unlinkSync( pathExtra.join(workingDir,'/test-renamed.jpeg') );
+      try {
+        fs.unlinkSync( pathExtra.join(workingDir, '/test-renamed.jpeg') );
       }catch(ex){}
-      try{
-        fs.unlinkSync( pathExtra.join(workingDir,'/test22.jpeg') );
+      try {
+        fs.unlinkSync( pathExtra.join(workingDir, '/test22.jpeg') );
       }catch(ex){}
     });
     it('should rename file', function (done) {
-      maClefUsb.rename('/test.jpeg','/test-renamed.jpeg',function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,'/test-renamed.jpeg')),
+      maClefUsb.rename('/test.jpeg', '/test-renamed.jpeg', function(){
+        var p = pathExtra.join(workingDir, '/test-renamed.jpeg');
+        assert(fs.existsSync(p),
           'did not rename file');
         done();
       });
     });
     it('should not rename non existent file', function (done) {
-      maClefUsb.rename('/no-file.jpeg','/no-file-renamed.jpeg',function(err){
+      maClefUsb.rename('/no-file.jpeg', '/no-file-renamed.jpeg', function(err){
         assert.equal(err, 'not-found', 'wrong storePath');
-        assert.equal(fs.existsSync(pathExtra.join(workingDir,'/no-file-renamed.jpeg')),
+        var p = pathExtra.join(workingDir, '/no-file-renamed.jpeg');
+        assert.equal(fs.existsSync(p),
           false, 'must not rename file');
         done();
       });
     });
     it('should not rename as an existent file', function (done) {
-      maClefUsb.rename('/test-renamed.jpeg','/test22.jpeg',function(err){
-        assert.notEqual(err,null,"must throw error")
-        assert.equal(err,"file-exists","must throw correct error")
-        assert(fs.existsSync(pathExtra.join(workingDir,'test-renamed.jpeg')),
+      maClefUsb.rename('/test-renamed.jpeg', '/test22.jpeg', function(err){
+        assert.notEqual(err,null, 'must throw error');
+        assert.equal(err, 'file-exists', 'must throw correct error');
+        assert(fs.existsSync(pathExtra.join(workingDir, 'test-renamed.jpeg')),
           'must not rename file');
         done();
       });
@@ -182,20 +186,20 @@ describe('maClefUsb', function () {
 
   describe('readfile', function () {
     before(function(done){
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+      maClefUsb.add(storePath, fileName, fstream, function(){
+        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
           'did not copy file');
         done();
       });
     });
     after(function(){
-      fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
+      fs.unlinkSync( pathExtra.join(workingDir, '/test.jpeg') );
     });
     it('returns a stream file', function (done) {
-      maClefUsb.readfile('/test.jpeg',function(err, stream){
+      maClefUsb.readfile('/test.jpeg', function(err, stream){
         assert.equal(err, null, 'err must be empty');
         var length = 0;
         stream.on('data', function(chunk) {
@@ -203,11 +207,11 @@ describe('maClefUsb', function () {
           stream.read();
         });
         stream.on('error', function(err) {
-          assert(err==null,
+          assert(err == null,
             'error occurred');
         });
         stream.on('end', function() {
-          assert(length>0,
+          assert(length > 0,
             'file is empty');
           done();
         });
@@ -215,7 +219,7 @@ describe('maClefUsb', function () {
       });
     });
     it('can not read file outside home directory', function (done) {
-      maClefUsb.readfile('../package.json',function(err, stream){
+      maClefUsb.readfile('../package.json', function(err, stream){
         assert.equal(err, 'not-acceptable', 'err must be correct');
         assert.equal(stream, null, 'stream must be null');
         done();
@@ -225,21 +229,21 @@ describe('maClefUsb', function () {
 
   describe('readdir', function () {
     before(function(done){
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+      maClefUsb.add(storePath, fileName, fstream, function(){
+        assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
           'did not copy file');
         done();
       });
     });
     after(function(){
-      fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
+      fs.unlinkSync( pathExtra.join(workingDir, '/test.jpeg') );
     });
     it('list directory items', function (done) {
-      maClefUsb.readdir('/',function(items){
-        assert.ok(items.length>1,
+      maClefUsb.readdir('/', function(items){
+        assert.ok(items.length > 1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
           'name is wrong');
@@ -251,8 +255,9 @@ describe('maClefUsb', function () {
       });
     });
     it('can not read dir outside home directory', function (done) {
-      maClefUsb.readfile('../',function(err){
-        assert.equal(err, 'not-acceptable', 'err must be correct');
+      maClefUsb.readfile('../', function(err){
+        assert.equal(err, 'not-acceptable',
+          'err must be correct');
         done();
       });
     });
@@ -260,20 +265,20 @@ describe('maClefUsb', function () {
 
   describe('readmeta', function () {
     before(function(done){
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+      maClefUsb.add(storePath, fileName, fstream, function(){
+        assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
           'did not copy file');
         done();
       });
     });
     after(function(){
-      fs.unlinkSync( pathExtra.join(workingDir,'/test.jpeg') );
+      fs.unlinkSync( pathExtra.join(workingDir, '/test.jpeg') );
     });
     it(' from file', function (done) {
-      maClefUsb.readmeta('/test.jpeg',function(meta){
+      maClefUsb.readmeta('/test.jpeg', function(meta){
         assert.equal(meta.name, 'test.jpeg',
           'name is wrong');
         assert.equal(meta.path, '/test.jpeg',
@@ -284,7 +289,7 @@ describe('maClefUsb', function () {
       });
     });
     it(' from dir', function (done) {
-      maClefUsb.readmeta('/',function(meta){
+      maClefUsb.readmeta('/', function(meta){
         assert.equal(meta.name, '.test-working_dir',
           'name is wrong');
         assert.equal(meta.path, '/',
@@ -293,7 +298,7 @@ describe('maClefUsb', function () {
       });
     });
     it('can not get meta outside home directory', function (done) {
-      maClefUsb.readfile('../package.json',function(err){
+      maClefUsb.readfile('../package.json', function(err){
         assert.equal(err, 'not-acceptable', 'err must be correct');
         done();
       });
@@ -302,53 +307,56 @@ describe('maClefUsb', function () {
 
   describe('remove', function () {
     before(function(done){
-      var fstream = fs.createReadStream( fixturesDir+'Bnw6oV6CEAAZjUE.jpg' );
+      var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream,function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath,fileName)),
+      maClefUsb.add(storePath, fileName, fstream, function(){
+        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
           'did not copy file');
         done();
       });
     });
     it(' a file', function (done) {
-      maClefUsb.remove('/test.jpeg',function(){
-        assert(!fs.existsSync(pathExtra.join(workingDir,'/test.jpeg')),
+      maClefUsb.remove('/test.jpeg', function(){
+        assert(!fs.existsSync(pathExtra.join(workingDir, '/test.jpeg')),
           'did not remove file');
         done();
       });
     });
     it(' a dir', function (done) {
-      fs.mkdirSync(pathExtra.join(workingDir,'/test2'));
-      maClefUsb.remove('/test2',function(){
-        assert(!fs.existsSync(pathExtra.join(workingDir,'/test.jpeg')),
+      fs.mkdirSync(pathExtra.join(workingDir, '/test2'));
+      maClefUsb.remove('/test2', function(){
+        assert(!fs.existsSync(pathExtra.join(workingDir, '/test.jpeg')),
           'did not remove file');
         done();
       });
     });
     it('can not delete item outside home directory', function (done) {
-      maClefUsb.readfile('../package.json',function(err){
-        assert.equal(err, 'not-acceptable', 'err must be correct');
+      maClefUsb.readfile('../package.json', function(err){
+        assert.equal(err, 'not-acceptable',
+          'err must be correct');
         done();
       });
     });
   });
 
   describe('changeHome', function () {
-    it('does not change home if directory does not exist', function (done) {
-      maClefUsb.changeHome('non-sense',function(success){
+    it('does not change if directory does not exist', function (done) {
+      maClefUsb.changeHome('non-sense', function(success){
         assert.equal(success, 'not-found',
           'must not change home');
         done();
       });
     });
     it('does change home if directory does exist', function (done) {
-      fs.mkdirSync( pathExtra.join(workingDir,'/test2') );
-      maClefUsb.changeHome(pathExtra.join(workingDir,'/test2'),function(success){
+      var pp = pathExtra.join(workingDir, '/test2');
+      fs.mkdirSync( pp );
+      maClefUsb.changeHome(pp, function(success){
         assert.ok(success,
           'must change home');
-        maClefUsb.addDir('/test3',function(){
-          assert(fs.existsSync(pathExtra.join(workingDir,'/test2','/test3')),
+        maClefUsb.addDir('/test3', function(){
+          var p = pathExtra.join(workingDir, '/test2', '/test3');
+          assert(fs.existsSync(p),
             'did not create dir');
           done();
         });
@@ -368,7 +376,7 @@ describe('Controllers', function () {
     maClefUsb.changeHome(workingDir);
     app = express();
     controllers.connect(app);
-    app.listen(3000)
+    app.listen(3000);
   });
   after(function(){
     fs.removeSync(workingDir);
@@ -376,38 +384,55 @@ describe('Controllers', function () {
 
   describe('readdir', function () {
     it('should answer 200', function (done) {
-      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'/'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/\[\]/),'must respond []')
+      request.post({
+          url: 'http://localhost:3000/readdir',
+          form: {dirPath: '/'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 200,
+            'must respond 200');
+          assert.ok(body.match(/\[\]/),
+            'must respond []');
           done();
         });
     });
     it('should answer 500', function (done) {
-      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'../'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,500,'must respond 500')
-          assert.ok(body.match(/not-acceptable/),'must respond not-acceptable')
+      request.post({
+          url: 'http://localhost:3000/readdir',
+          form: {dirPath: '../'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/not-acceptable/),
+            'must respond not-acceptable');
           done();
         });
     });
     it('should answer 404', function (done) {
-      request.post({url:'http://localhost:3000/readdir',form:{dirPath:'/not-found'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,404,'must respond 404')
-          assert.ok(body.match(/not-found/),'must respond not-found')
+      request.post({
+          url: 'http://localhost:3000/readdir',
+          form: {dirPath: '/not-found'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 404,
+            'must respond 404');
+          assert.ok(body.match(/not-found/),
+            'must respond not-found');
           done();
         });
     });
     it('should answer 200', function (done) {
-      request.post({url:'http://localhost:3000/readdir',form:{}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/\[\]/),'must respond missing dirPath param')
+      request.post({
+          url: 'http://localhost:3000/readdir',
+          form: {}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.ok(body.match(/\[\]/), 'must respond missing dirPath param');
           done();
         });
     });
@@ -415,38 +440,55 @@ describe('Controllers', function () {
 
   describe('addDir', function () {
     it('should answer 200', function (done) {
-      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'/test2'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,200,'must respond 200')
-          assert.ok(body.match(/path":"\/test2","dirname":"\/","name":"test2"/),'must respond items')
+      request.post({
+          url: 'http://localhost:3000/add-dir',
+          form: {dirPath: '/test2'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+        var p = /path":"\/test2","dirname":"\/","name":"test2"/;
+          assert.ok(body.match(p),
+            'must respond items');
           done();
         });
     });
     it('should answer 500', function (done) {
-      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'/test2'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,500,'must respond 500')
-          assert.ok(body.match(/dir-exists/),'must respond dir-exists')
+      request.post({
+          url: 'http://localhost:3000/add-dir',
+          form: {dirPath: '/test2'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/dir-exists/),
+            'must respond dir-exists');
           done();
         });
     });
     it('should answer 500', function (done) {
-      request.post({url:'http://localhost:3000/add-dir',form:{dirPath:'../test2'}},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,500,'must respond 500')
-          assert.ok(body.match(/not-acceptable/),'must respond not-acceptable')
+      request.post({
+          url: 'http://localhost:3000/add-dir',
+          form: {dirPath: '../test2'}
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/not-acceptable/),
+            'must respond not-acceptable');
           done();
         });
     });
     it('should answer 500', function (done) {
-      request.post({url:'http://localhost:3000/add-dir'},
+      request.post({url: 'http://localhost:3000/add-dir'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null')
-          assert.equal(response.statusCode,500,'must respond 500')
-          assert.ok(body.match(/missing dirPath param/),'must respond testupload')
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/missing dirPath param/),
+            'must respond testupload');
           done();
         });
     });
@@ -457,30 +499,41 @@ describe('Controllers', function () {
       var formData = {
         // Pass a simple key-value pair
         path: '/',
+        /*eslint-disable */
         custom_file: {
-          value:  fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
+        /*eslint-enable */
+          value: fs.createReadStream(fixturesDir + '/Bnw6oV6CEAAZjUE.jpg'),
           options: {
             filename: 'testupload.jpg',
             contentType: 'image/jpg'
           }
         }
       };
-      var r = request.post({url:'http://localhost:3000/add', formData: formData},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/testupload/),'must respond testupload');
-          assert.ok(fs.existsSync(workingDir+'testupload.jpg'),'file must exists');
+      request.post({
+          url: 'http://localhost:3000/add',
+          formData: formData
+        }, function optionalCallback(error, response, body) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200,
+            'must respond 200');
+          assert.ok(body.match(/testupload/),
+            'must respond testupload');
+          assert.ok(fs.existsSync(workingDir + 'testupload.jpg'),
+            'file must exists');
           done();
         });
     });
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/add'},
+      var r = request.post({url: 'http://localhost:3000/add'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/testupload/),'must respond testupload');
-          assert.ok(fs.existsSync(workingDir+'test2/testupload.jpg'),'file must exists');
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 200,
+            'must respond 200');
+          assert.ok(body.match(/testupload/),
+            'must respond testupload');
+          assert.ok(fs.existsSync(workingDir + 'test2/testupload.jpg'),
+            'file must exists');
           done();
         });
       var form = r.form();
@@ -490,11 +543,14 @@ describe('Controllers', function () {
         {filename: 'testupload.jpg'});
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/add'},
+      var r = request.post({url: 'http://localhost:3000/add'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/missing path param/),
+            'must respond \'missing path param\'');
           done();
         });
       var form = r.form();
@@ -503,11 +559,14 @@ describe('Controllers', function () {
         {filename: 'testupload.jpg'});
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/add'},
+      var r = request.post({url: 'http://localhost:3000/add'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing file param/),'must respond "missing file param"');
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/missing file param/),
+            'must respond \'missing file param\'');
           done();
         });
       var form = r.form();
@@ -517,13 +576,17 @@ describe('Controllers', function () {
 
   describe('addNote', function () {
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/add-note'},
+      var r = request.post({url: 'http://localhost:3000/add-note'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/my_text file/),'must respond "my_text file"');
-          assert.ok(fs.existsSync(workingDir+'my_text file.txt'),'file must exists');
-          assert.ok((fs.readFileSync(workingDir+'my_text file.txt')+'').match(/some content/),
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200,
+            'must respond 200');
+          assert.ok(body.match(/my_text file/),
+            'must respond \'my_text file\'');
+          assert.ok(fs.existsSync(workingDir + 'my_text file.txt'),
+            'file must exists');
+          var c = fs.readFileSync(workingDir + 'my_text file.txt') + '';
+          assert.ok(c.match(/some content/),
             'file content must be recorded');
           done();
         });
@@ -533,13 +596,17 @@ describe('Controllers', function () {
       form.append('content', 'some content');
     });
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/add-note'},
+      var r = request.post({url: 'http://localhost:3000/add-note'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/my_text file/),'must respond "my_text file"');
-          assert.ok(fs.existsSync(workingDir+'/test2/my_text file.txt'),'file must exists');
-          assert.ok((fs.readFileSync(workingDir+'/test2/my_text file.txt')+'').match(/some content/),
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200,
+            'must respond 200');
+          assert.ok(body.match(/my_text file/),
+            'must respond \'my_text file\'');
+          assert.ok(fs.existsSync(workingDir + '/test2/my_text file.txt'),
+            'file must exists');
+          var c = fs.readFileSync(workingDir + '/test2/my_text file.txt') + '';
+          assert.ok( c.match(/some content/),
             'file content must be recorded');
           done();
         });
@@ -549,11 +616,14 @@ describe('Controllers', function () {
       form.append('content', 'some content');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/add-note'},
+      var r = request.post({url: 'http://localhost:3000/add-note'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          assert.equal(error, null,
+            'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/missing path param/),
+            'must respond \'missing path param\'');
           done();
         });
       var form = r.form();
@@ -561,11 +631,12 @@ describe('Controllers', function () {
       form.append('content', 'some content');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/add-note'},
+      var r = request.post({url: 'http://localhost:3000/add-note'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing fileName param/),'must respond "missing fileName param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/missing fileName param/),
+            'must respond \'missing fileName param\'');
           done();
         });
       var form = r.form();
@@ -573,11 +644,12 @@ describe('Controllers', function () {
       form.append('content', 'some content');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/add-note'},
+      var r = request.post({url: 'http://localhost:3000/add-note'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing content param/),'must respond "missing content param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/missing content param/),
+            'must respond \'missing content param\'');
           done();
         });
       var form = r.form();
@@ -588,12 +660,14 @@ describe('Controllers', function () {
 
   describe('rename', function () {
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.equal(fs.existsSync(workingDir+'testupload.jpg'),false,'file must not exists');
-          assert.equal(fs.existsSync(workingDir+'text_file'),true,'file must exists');
+      var r = request.post({url: 'http://localhost:3000/rename'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.equal(fs.existsSync(workingDir + 'testupload.jpg'), false,
+            'file must not exists');
+          assert.equal(fs.existsSync(workingDir + 'text_file'), true,
+            'file must exists');
           done();
         });
       var form = r.form();
@@ -601,12 +675,14 @@ describe('Controllers', function () {
       form.append('newPath', 'text_file');
     });
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.equal(fs.existsSync(workingDir+'test2'),false,'file must not exists');
-          assert.equal(fs.existsSync(workingDir+'test3'),true,'file must exists');
+      var r = request.post({url: 'http://localhost:3000/rename'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.equal(fs.existsSync(workingDir + 'test2'), false,
+            'file must not exists');
+          assert.equal(fs.existsSync(workingDir + 'test3'),true,
+            'file must exists');
           done();
         });
       var form = r.form();
@@ -614,33 +690,38 @@ describe('Controllers', function () {
       form.append('newPath', 'test3');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
+      var r = request.post({url: 'http://localhost:3000/rename'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing newPath param/),'must respond "missing newPath param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/missing newPath param/),
+            'must respond \'missing newPath param\'');
           done();
         });
       var form = r.form();
       form.append('oldPath', 'test2');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
+      var r = request.post({url: 'http://localhost:3000/rename'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing oldPath param/),'must respond "missing oldPath param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/missing oldPath param/),
+            'must respond \'missing oldPath param\'');
           done();
         });
       var form = r.form();
       form.append('newPath', 'test2');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
+      var r = request.post({url: 'http://localhost:3000/rename'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/file-exists/),'must respond "file-exists"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500,
+            'must respond 500');
+          assert.ok(body.match(/file-exists/),
+            'must respond \'file-exists\'');
           done();
         });
       var form = r.form();
@@ -648,11 +729,12 @@ describe('Controllers', function () {
       form.append('newPath', 'text_file');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/rename'},
+      var r = request.post({url: 'http://localhost:3000/rename'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/file-exists/),'must respond "file-exists"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/file-exists/),
+            'must respond \'file-exists\'');
           done();
         });
       var form = r.form();
@@ -663,32 +745,33 @@ describe('Controllers', function () {
 
   describe('readmeta', function () {
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/readmeta'},
+      var r = request.post({url: 'http://localhost:3000/readmeta'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/name":"text_file/),'must respond file meta');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.ok(body.match(/name":"text_file/),
+            'must respond file meta');
           done();
         });
       var form = r.form();
       form.append('itemPath', 'text_file');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/readmeta'},
+      request.post({url: 'http://localhost:3000/readmeta'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing itemPath param/),'must respond "missing itemPath param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/missing itemPath param/),
+            'must respond \'missing itemPath param\'');
           done();
         });
-      var form = r.form();
     });
     it('should answer 404', function (done) {
-      var r = request.post({url:'http://localhost:3000/readmeta'},
+      var r = request.post({url: 'http://localhost:3000/readmeta'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,404,'must respond 404');
-          assert.ok(body.match(/not-found/),'must respond "not-found"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 404, 'must respond 404');
+          assert.ok(body.match(/not-found/), 'must respond \'not-found\'');
           done();
         });
       var form = r.form();
@@ -698,48 +781,47 @@ describe('Controllers', function () {
 
   describe('readfile', function () {
     it('should answer 200', function (done) {
-      request.get({url:'http://localhost:3000/readfile/text_file'},
+      request.get({url: 'http://localhost:3000/readfile/text_file'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.ok(body.match(/is is not a picture/),'must respond file content');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.ok(body.match(/is is not a picture/),
+            'must respond file content');
           done();
         });
     });
     it('should answer 404', function (done) {
-      var r = request.get({url:'http://localhost:3000/readfile'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,404,'must respond 404');
+      request.get({url: 'http://localhost:3000/readfile'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 404, 'must respond 404');
           done();
         });
-      var form = r.form();
     });
     it('should answer 404', function (done) {
-      var r = request.get({url:'http://localhost:3000/readfile/'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,404,'must respond 404');
+      request.get({url: 'http://localhost:3000/readfile/'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 404, 'must respond 404');
           done();
         });
-      var form = r.form();
     });
     it('should answer 500', function (done) {
-      var r = request.get({url:'http://localhost:3000/readfile/test3'},
+      request.get({url: 'http://localhost:3000/readfile/test3'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/not-a-file/),'must respond "not-a-file"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/not-a-file/),
+            'must respond \'not-a-file\'');
           done();
         });
-      var form = r.form();
     });
     it('should answer 404', function (done) {
-      var r = request.get({url:'http://localhost:3000/readfile/not-a-file'},
+      var r = request.get({url: 'http://localhost:3000/readfile/not-a-file'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,404,'must respond 404');
-          assert.ok(body.match(/not-found/),'must respond "not-found"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 404, 'must respond 404');
+          assert.ok(body.match(/not-found/), 'must respond \'not-found\'');
           done();
         });
       var form = r.form();
@@ -752,38 +834,39 @@ describe('Controllers', function () {
 
   describe('remove', function () {
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/remove'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.equal(fs.existsSync(workingDir+'text_file'),false,'file must not exists');
+      var r = request.post({url: 'http://localhost:3000/remove'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.equal(fs.existsSync(workingDir + 'text_file'), false,
+            'file must not exists');
           done();
         });
       var form = r.form();
       form.append('path', 'text_file');
     });
     it('should answer 200', function (done) {
-      var r = request.post({url:'http://localhost:3000/remove'},
-        function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,200,'must respond 200');
-          assert.equal(fs.existsSync(workingDir+'test3'),false,'directory must not exists');
+      var r = request.post({url: 'http://localhost:3000/remove'},
+        function optionalCallback(error, response) {
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 200, 'must respond 200');
+          assert.equal(fs.existsSync(workingDir + 'test3'), false,
+            'directory must not exists');
           done();
         });
       var form = r.form();
       form.append('path', 'test3');
     });
     it('should answer 500', function (done) {
-      var r = request.post({url:'http://localhost:3000/remove'},
+      request.post({url: 'http://localhost:3000/remove'},
         function optionalCallback(error, response, body) {
-          assert.equal(error,null,'error must be null');
-          assert.equal(response.statusCode,500,'must respond 500');
-          assert.ok(body.match(/missing path param/),'must respond "missing path param"');
+          assert.equal(error, null, 'error must be null');
+          assert.equal(response.statusCode, 500, 'must respond 500');
+          assert.ok(body.match(/missing path param/),
+            'must respond \'missing path param\'');
           done();
         });
-      var form = r.form();
     });
   });
 
 });
-

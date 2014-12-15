@@ -8,11 +8,11 @@ var maClefUsb = require('./ma-clef-usb');
 var controllers = require('./controllers');
 
 var cozyHandler = {
-  start:function(options, done) {
+  start: function(options, done) {
     var app = express();
 
     controllers.connect(app);
-    app.use(express.static(__dirname + '/public'));
+    app.use(express.static( pathExtra.join(__dirname, '/public')));
 
     var server = http.createServer(app);
     server.listen( options.getPort(), options.hostname || '127.0.0.1' );
@@ -21,12 +21,14 @@ var cozyHandler = {
 
     done(null, app, server);
   },
-  stop:function(done) {
-    if( done ) done();
+  stop: function(done) {
+    if ( done ) {
+      done();
+    }
   },
-  load:function() {
+  load: function() {
     var home = pathExtra.join(pathExtra.homedir(), 'ma-clef-usb');
-    if( fs.existsSync(home) == false ){
+    if ( fs.existsSync(home) === false ){
       fs.mkdirSync(home);
     }
     maClefUsb.changeHome(home);
