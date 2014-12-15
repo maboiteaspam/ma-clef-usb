@@ -22,7 +22,7 @@
   "bin": {
     "ma-clef-usb": "bin.js"
   },
-  "main": "cozy.js",
+  "main": "application.js",
   "contributors": [
     "maboiteaspam"
   ],
@@ -48,7 +48,7 @@
   },
   "scripts": {
     "test": "mocha --globals s --reporter spec",
-    "lint": "eslint index.js tests/tests.js tests/integration.js"
+    "lint": "eslint bin.js cozy.js ma-clef-usb.js test/tests.js test/integration.js"
   },
   "repository": {
     "type": "git",
