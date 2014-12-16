@@ -13,7 +13,7 @@
         ng-model="files"
         ng-file-change="fileDropped($files, $event, $rejectedFiles, item.type=='file'?dir:item)"
         drag-over-class="{accept:'', reject:'', delay:100}"
-        multiple="false"
+        multiple="true"
         allow-dir="false"
             >
         <td>

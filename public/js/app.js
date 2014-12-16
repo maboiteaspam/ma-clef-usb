@@ -25,6 +25,9 @@ angular
       var inDragLeave = function(){
         element.removeClass('drag-in');
       };
+      var inDrop = function(){
+        element.removeClass('drag-in');
+      };
 
       var afterDragEnter = function(){
         if( ! element.next().hasClass('drop_el') ){
@@ -56,18 +59,34 @@ angular
           },750)
         }
       };
+      var afterDrop = function(){
+        if( element.next().hasClass('drop_el') ){
+          var drop_el = element.next();
+          drop_el.removeClass('in');
+          drop_el.addClass('out');
+          $timeout(function(){
+            if( drop_el.hasClass("out") ){
+              drop_el.removeClass('out');
+            }
+          },750)
+        }
+      };
 
       scope.$watch(attrs.drop, function(value){
         if( attrs.drop == 'in' ){
           element[0].removeEventListener('dragenter', afterDragEnter);
           element[0].removeEventListener('dragleave', afterDragLeave);
+          element[0].removeEventListener('drop', afterDrop);
           element[0].addEventListener('dragenter', inDragEnter, false);
           element[0].addEventListener('dragleave', inDragLeave, false);
+          element[0].addEventListener('drop', inDrop, false);
         } else {
           element[0].removeEventListener('dragenter', inDragEnter);
           element[0].removeEventListener('dragleave', inDragLeave);
+          element[0].removeEventListener('drop', inDrop);
           element[0].addEventListener('dragenter', afterDragEnter, false);
           element[0].addEventListener('dragleave', afterDragLeave, false);
+          element[0].addEventListener('drop', afterDrop, false);
         }
       });
     }
@@ -152,34 +171,26 @@ angular
     var std_error = /err|not-found|dir-exists|file-exists/;
     this.get = function(path,then){
       return $.post("readmeta",{itemPath:path},function(item){
-        if( (''+item).match(std_error) ){
-          then(null);
-        } else {
-          then(item);
-        }
+        then(item);
+      }).fail(function() {
+        then(null);
       });
     };
     this.remove = function(path,then){
       return $.post("remove",{path:path},function(err){
-        if( (''+err).match(std_error) ){
-          then(false);
-        } else {
-          then(true);
-        }
+        then(true);
+      }).fail(function() {
+        then(false);
       });
     };
     this.addDir = function(path,then){
       return $.post("add-dir",{dirPath:path},function(item){
-        if( (''+item).match(std_error) ){
-          then(false);
-        } else {
-          then(true,item);
-        }
+        then(true,item);
+      }).fail(function() {
+        then(false);
       });
     };
     this.add = function(path,file,then){
-      var that = this;
-      console.log(file)
       return $upload.upload({
         url: 'add',
         method: 'POST',
@@ -198,21 +209,18 @@ angular
       });
     };
     this.addNote = function(path,fileName,content,then){
-      return $.post("add-note",{path:path,fileName:fileName,content:content},function(item){
-        if( (''+item).match(std_error) ){
-          then(false);
-        } else {
-          then(true,item);
-        }
+      var data = {path:path,fileName:fileName,content:content};
+      return $.post("add-note", data, function(item){
+        then(true,item);
+      }).fail(function() {
+        then(false);
       });
     };
     this.readdir = function(path,then){
       return $.post("readdir",{dirPath:path},function(items){
-        if( (''+items).match(std_error) ){
-          then(false,null);
-        } else {
-          then(true,items);
-        }
+        then(true,items);
+      }).fail(function() {
+        then(false);
       });
     };
   })

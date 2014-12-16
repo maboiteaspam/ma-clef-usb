@@ -63,7 +63,7 @@ angular.module('maClefUsbApp')
       fsLayer.remove(item.path,function(s){
         $scope.$apply(function(){
           if( !s ){
-            $rootScope.$broadcast('showPopin', 'wontBrowse');
+            $rootScope.$broadcast('failedDelete', item.path);
           } else {
             $rootScope.$broadcast('refresh');
           }

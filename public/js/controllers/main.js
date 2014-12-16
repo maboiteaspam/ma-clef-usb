@@ -44,7 +44,7 @@ angular.module('maClefUsbApp')
       fsLayer.readdir(item.path,function(s,items){
         $scope.$apply(function(){
           if( !s ){
-            $rootScope.$broadcast('showPopin', 'wontBrowse');
+            $rootScope.$broadcast('failedRead', item);
           } else {
             $rootScope.$broadcast('pathChanged', item, items);
           }
@@ -77,17 +77,23 @@ angular.module('maClefUsbApp')
       $scope.count_progress--;
     });
 
-    var update_view = function(){
-      var current_path = "/";
-      if( window.location.hash ){
-        current_path = window.location.hash.match(/#(.+)/)[1];
-        current_path = decodeURI(current_path);
+    var update_view = function(current_path){
+      if( ! current_path ){
+        current_path = "/";
+        if( window.location.hash ){
+          current_path = window.location.hash.match(/#(.+)/)[1];
+          current_path = decodeURI(current_path);
+        }
       }
       fsLayer.get(current_path,function(item){
         $scope.$apply(function(){
           if(!item){
-            $rootScope.$broadcast('showPopin', 'wontBrowse');
-            update_breadcrumb(current_path);
+            $rootScope.$broadcast('failedRead', current_path);
+            if ( current_path == "/" ) {
+              throw "Root folder not found !";
+            }
+            window.location.hash = "#/";
+            update_view();
           }else{
             if( item.type == 'file' ){
               $rootScope.$broadcast('changePath', {path:item.dirname,type:'folder'});
@@ -97,5 +103,7 @@ angular.module('maClefUsbApp')
         });
       });
     };
-    update_view();
+    setTimeout(function(){
+      update_view();
+    },250)
   }]);

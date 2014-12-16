@@ -27,10 +27,12 @@
      ng-class="{visible: name=='addFolder'}"
      class="addFolder popin-body"></div>
 
-<div ng-include="'views/popins/wontBrowse.html'"
-     ng-if="name=='wontBrowse'"
-     ng-class="{visible: name=='wontBrowse'}"
-     class="wontBrowse popin-body"></div>
+<div ng-controller="AlertMessageCtrl"
+     ng-class="{visible: name=='alertMessage'}"
+     class="wontBrowse popin-body">
+     <div ng-include="'views/popins/alertMessage.html'"
+          ng-if="name=='alertMessage'"></div>
+</div>
 
 <div ng-include="'views/popins/previewFile.html'"
      ng-controller="PreviewFileCtrl"

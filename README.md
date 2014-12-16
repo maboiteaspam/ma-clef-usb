@@ -14,11 +14,12 @@ what we use to do with usb  stick in old times !
 
 ### User interface capabilities
 - HTML5 mobile compatible
-- upload / download large files
+- upload / download large files with progression
 - able to stream mp3/wav/webm/mp4
 - if ffmpeg is available, it s able to encode on the fly then stream avi/flv/ogv
 - preview files
 - browse/search your files
+- support multiple file drag and drop, not directories..
 
 ### Technical information
 - Server build on top of nodeJS / expressJS
