@@ -44,11 +44,14 @@
     </nav>
     <div ng-include="'views/breadCrumb.html'"
          class="container-fluid bcrumb"></div>
-    <div class="container-fluid">
-        <!-- Add your site or application content here -->
-        <div class="panel panel-default">
+    <div class="container-fluid"
+         ng-controller="ListItemsCtrl">
+        <div class="panel panel-default" ng-show="items.length>0">
             <div ng-include="'views/listItems.html'"
-                 ng-controller="ListItemsCtrl"
+                 class="panel-body"></div>
+        </div>
+        <div class="panel panel-default empty-list-items" ng-show="items.length==0">
+            <div ng-include="'views/listEmpty.html'"
                  class="panel-body"></div>
         </div>
     </div>

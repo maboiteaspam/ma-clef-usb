@@ -70,4 +70,36 @@ angular.module('maClefUsbApp')
         });
       });
     };
+
+      $rootScope.fileDropped = function($files, $event, $rej, $dir) {
+        if( !$dir || $dir.type !== 'folder' ) throw "must be directory";
+        for (var i = 0; i < $files.length; i++) {
+          var file = $files[i];
+          if( file.type !== "directory" ) {
+            $scope.upload = fsLayer.add($dir.path,file,function(s){
+              $scope.$evalAsync(function(){
+                if( !s ){
+                  $rootScope.$broadcast('failedFileDropped', $dir.path+'/'+file.name);
+                }
+              });
+            }).progress(function(evt) {
+              $rootScope.$broadcast('uploadProgress', {
+                filename:evt.config.file.name,
+                lastModifiedDate:evt.config.file.lastModifiedDate,
+                type:evt.config.file.type,
+                percent:parseInt(100.0 * evt.loaded / evt.total),
+                loaded:evt.loaded,
+                total:evt.total
+              });
+            }).success(function(data, status, headers, config) {
+              $rootScope.$broadcast('uploadDone', {
+                filename:config.file.name
+              });
+              $rootScope.$broadcast('refresh');
+            });
+          }
+        }
+      };
+
+
   }]);

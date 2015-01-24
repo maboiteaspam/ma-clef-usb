@@ -1,0 +1,10 @@
+<div class="drop-zone"
+     ng-file-drop
+     ng-model="files"
+     ng-file-change="fileDropped($files, $event, $rejectedFiles, dir)"
+     drag-over-class="{accept:'drop-ok', reject:'', delay:100}"
+     multiple="true"
+     allow-dir="false">
+    Drop your files here
+    <i class="glyphicon glyphicon-ok"></i>
+</div>

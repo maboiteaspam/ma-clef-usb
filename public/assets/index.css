@@ -188,3 +188,23 @@ body {
 .drop_el.out td{
     height: 0;
 }
+
+
+.empty-list-items{
+    text-align: center;
+    vertical-align: middle;
+}
+.drop-zone .glyphicon{
+    font-size: 400%;
+    display: block;
+    line-height: 200%;
+
+    color: black;
+    opacity: 0;
+    transition-property: all;
+    transition-duration: 0.7s;
+}
+.drop-zone.drop-ok .glyphicon{
+    opacity: 1;
+    color: green;
+}
