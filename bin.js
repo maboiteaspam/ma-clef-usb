@@ -17,10 +17,10 @@ program
   .version(pkg.version);
 
 program
+    .option('-H, --home <homedirectory>', 'Home directory to use in ma clef usb')
+    .option('-h, --host <hostname>', 'hostname on which ma clef usb is available')
+    .option('-p, --port <port>', 'port number on which ma clef usb is available')
   .command('start')
-  .option('-H, --home <homedirectory>', 'Home directory to use in ma clef usb')
-  .option('-h, --host <hostname>', 'hostname on which ma clef usb is available')
-  .option('-p, --port <port>', 'port number on which ma clef usb is available')
   .description('start ma clef usb server')
   .action(function(){
 
