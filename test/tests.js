@@ -68,10 +68,10 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName,fstream, function(items){
+      maClefUsb.add(storePath, fileName, fstream, function(items){
         assert.notEqual(items, 'not-found',
           'wrong storePath');
-        var targetPath = pathExtra.join(workingDir,storePath,fileName);
+        var targetPath = pathExtra.join(workingDir, storePath, fileName);
         assert(fs.existsSync(targetPath),
           'did not write file ' + targetPath);
         done();
@@ -81,7 +81,7 @@ describe('maClefUsb', function () {
       var fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
       var storePath = '/';
       var fileName = 'test.jpeg';
-      maClefUsb.add(storePath,fileName, fstream, function(items){
+      maClefUsb.add(storePath, fileName, fstream, function(items){
         assert.ok(items.length > 1,
           'response is missing new file');
         assert.equal(items[0].name, 'test.jpeg',
@@ -109,7 +109,7 @@ describe('maClefUsb', function () {
         maClefUsb.add(storePath, fileName, fstream, function(items){
           assert.notEqual(items, 'not-found',
             'wrong storePath');
-          assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
+          assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
             'did not copy file');
           fs.unlinkSync( pathExtra.join(workingDir, '/test3/test5.jpeg') );
           fs.rmdirSync( pathExtra.join(workingDir, '/test3') );
@@ -123,7 +123,7 @@ describe('maClefUsb', function () {
       var fileName = 'test.jpeg';
       maClefUsb.add(storePath, fileName, fstream, function(items){
         assert.equal(items, 'not-acceptable', 'wrong storePath');
-        var p = pathExtra.join(workingDir,storePath, '../', fileName);
+        var p = pathExtra.join(workingDir, storePath, '../', fileName);
         assert.equal(fs.existsSync(p), false,
           'must not write file');
         done();
@@ -137,12 +137,13 @@ describe('maClefUsb', function () {
       var storePath = '/';
       var fileName = 'test.jpeg';
       maClefUsb.add(storePath, fileName, fstream, function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
+        assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
           'did not copy file');
         fstream = fs.createReadStream( fixturesDir + 'Bnw6oV6CEAAZjUE.jpg' );
         var fileName2 = 'test22.jpeg';
         maClefUsb.add(storePath, fileName2, fstream, function(){
-          assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName2)),
+          var copiedPath = pathExtra.join(workingDir, storePath, fileName2);
+          assert(fs.existsSync(copiedPath),
             'did not copy file');
           done();
         });
@@ -175,7 +176,7 @@ describe('maClefUsb', function () {
     });
     it('should not rename as an existent file', function (done) {
       maClefUsb.rename('/test-renamed.jpeg', '/test22.jpeg', function(err){
-        assert.notEqual(err,null, 'must throw error');
+        assert.notEqual(err, null, 'must throw error');
         assert.equal(err, 'file-exists', 'must throw correct error');
         assert(fs.existsSync(pathExtra.join(workingDir, 'test-renamed.jpeg')),
           'must not rename file');
@@ -190,7 +191,7 @@ describe('maClefUsb', function () {
       var storePath = '/';
       var fileName = 'test.jpeg';
       maClefUsb.add(storePath, fileName, fstream, function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
+        assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
           'did not copy file');
         done();
       });
@@ -206,8 +207,8 @@ describe('maClefUsb', function () {
           length += chunk.length;
           stream.read();
         });
-        stream.on('error', function(err) {
-          assert(err == null,
+        stream.on('error', function(streamErr) {
+          assert(streamErr == null,
             'error occurred');
         });
         stream.on('end', function() {
@@ -311,7 +312,7 @@ describe('maClefUsb', function () {
       var storePath = '/';
       var fileName = 'test.jpeg';
       maClefUsb.add(storePath, fileName, fstream, function(){
-        assert(fs.existsSync(pathExtra.join(workingDir,storePath, fileName)),
+        assert(fs.existsSync(pathExtra.join(workingDir, storePath, fileName)),
           'did not copy file');
         done();
       });
@@ -681,7 +682,7 @@ describe('Controllers', function () {
           assert.equal(response.statusCode, 200, 'must respond 200');
           assert.equal(fs.existsSync(workingDir + 'test2'), false,
             'file must not exists');
-          assert.equal(fs.existsSync(workingDir + 'test3'),true,
+          assert.equal(fs.existsSync(workingDir + 'test3'), true,
             'file must exists');
           done();
         });

@@ -57,7 +57,7 @@ var api = {
     if (!isAcceptablePath(filePath) ){
       return done('not-acceptable');
     }else if ( fs.existsSync(filePath) ){
-      return done(null,fs.createReadStream(filePath));
+      return done(null, fs.createReadStream(filePath));
     }
     done('not-found');
   },

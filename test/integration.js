@@ -15,8 +15,8 @@ describe('ma Clef USB', function () {
     this.timeout(50000);
     cozyLight.configHelpers.init(workingDir, {});
     cozyLight.actions.noExpressLog = !true;
-    cozyLight.actions.start({},function(){
-      var p = pathExtra.join(__dirname,'../');
+    cozyLight.actions.start({}, function(){
+      var p = pathExtra.join(__dirname, '../');
       cozyLight.actions.installApp(p, function(){
         done();
       });
@@ -35,7 +35,7 @@ describe('ma Clef USB', function () {
 
 // Browser instance for this test
       var browser = Browser.create();
-      browser.visit('/apps/ma-clef-usb/',function() {
+      browser.visit('/apps/ma-clef-usb/', function() {
         browser.assert.url('http://localhost:19104/apps/ma-clef-usb/');
         setTimeout(function(){
           try {
@@ -70,7 +70,7 @@ describe('ma Clef USB', function () {
            });
            });
            */
-        },5500);
+        }, 5500);
       });
 
     });

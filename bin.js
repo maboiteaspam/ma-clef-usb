@@ -17,9 +17,12 @@ program
   .version(pkg.version);
 
 program
-    .option('-H, --home <homedirectory>', 'Home directory to use in ma clef usb')
-    .option('-h, --host <hostname>', 'hostname on which ma clef usb is available')
-    .option('-p, --port <port>', 'port number on which ma clef usb is available')
+  .option('-H, --home <homedirectory>',
+  'Home directory to use in ma clef usb')
+  .option('-h, --host <hostname>',
+  'hostname on which ma clef usb is available')
+  .option('-p, --port <port>',
+  'port number on which ma clef usb is available')
   .command('start')
   .description('start ma clef usb server')
   .action(function(){
@@ -37,7 +40,7 @@ program
     };
 
 
-    maClefUsbCozy.start(opts,function(err, app, server){
+    maClefUsbCozy.start(opts, function(err, app, server){
 
       if (err) {
         console.error(err);
@@ -56,7 +59,7 @@ program
 
       cozyLight.nodeHelpers.clearCloseServer(server);
 
-      readlineToQuit('\t   Press enter to leave...\n',function(){
+      readlineToQuit('\t   Press enter to leave...\n', function(){
         maClefUsbCozy.stop(function(){
           server.close();
           console.log('\t   ..bye!');
