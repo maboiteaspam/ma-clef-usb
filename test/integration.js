@@ -1,7 +1,7 @@
 'use strict';
 var pathExtra = require('path-extra');
 var Browser = require('zombie');
-var cozyLight = require('cozy-light');
+var spawn = require('child_process').spawn;
 
 var workingDir = pathExtra.join( __dirname, '/../.test-working_dir/');
 var fixturesDir = pathExtra.join( __dirname, '/../fixtures/');
@@ -11,20 +11,47 @@ fixturesDir = pathExtra.resolve(fixturesDir) + '/';
 describe('ma Clef USB', function () {
   this.timeout(600000);
 
+
+  var openProcess = function (cmds, callback) {
+    console.error('+ ' + cmds.join(' '));
+    var bin = cmds.shift();
+    var cozyProcess = spawn(bin, cmds);
+
+    if (callback) {
+      var output = '';
+      var stdout = '';
+      var stderr = '';
+      cozyProcess.stdout.on('data', function (chunk) {
+        output += chunk;
+        stdout += chunk;
+      });
+      cozyProcess.stderr.on('data', function (chunk) {
+        output += chunk;
+        stderr += chunk;
+      });
+      cozyProcess.on('close', function (code) {
+        callback(output, stdout, stderr, code);
+      });
+    }
+    return cozyProcess;
+  };
+
+  var cozyProcess;
   before(function(done){
     this.timeout(50000);
-    cozyLight.configHelpers.init(workingDir, {});
-    cozyLight.actions.noExpressLog = !true;
-    cozyLight.actions.start({}, function(){
-      var p = pathExtra.join(__dirname, '../');
-      cozyLight.actions.installApp(p, function(){
-        done();
-      });
-    });
+    var cmd = [
+      'cozy-light',
+      'start',
+      '--home',
+      workingDir
+    ];
+    cozyProcess = openProcess(cmd);
+    done();
   });
   after(function(done){
     this.timeout(50000);
-    cozyLight.actions.exit(done);
+    cozyProcess.kill();
+    done();
   });
 
 
