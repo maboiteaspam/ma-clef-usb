@@ -30,7 +30,7 @@ program
     var home = program.home
       || pathExtra.join(pathExtra.homedir(), 'ma-clef-usb');
     var port = parseInt(program.port) || 8080;
-    var hostname = program.hostname || '127.0.0.1';
+    var hostname = program.host || '127.0.0.1';
 
     var opts = {
       hostname: hostname,
