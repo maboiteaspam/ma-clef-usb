@@ -46,7 +46,7 @@ browse http://localhost:19104/
 # Install as a stand alone
 Install Node.js (>= 0.10)
 ```
-npm i maboiteaspam/ma-clef-usb -g
+npm i ma-clef-usb -g
 ```
 
 ### Run the standalone app
