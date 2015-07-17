@@ -1,7 +1,7 @@
 {
   "name": "ma-clef-usb",
   "description": "Ma clef Usb, a webapp on top of cozy-light PAAS to transfer files between computers, what we use to do with usb  stick in old times !",
-  "version": "0.0.1b",
+  "version": "0.0.2",
   "author": "maboiteaspam",
   "licenses": [
     {
@@ -31,20 +31,20 @@
   },
   "dependencies": {
     "commander": "2.3.0",
-    "express": "^4.8.2",
-    "formidable": "^1.0.15",
+    "express": "~4.8.2",
+    "formidable": "~1.0.15",
     "fs-extra": "0.10.0",
-    "glob": "^4.2.1",
-    "mime": "^1.2.11",
-    "multiparty": "^4.1.0",
+    "glob": "~4.2.1",
+    "mime": "~1.2.11",
+    "multiparty": "~4.1.0",
     "path-extra": "0.2.1",
     "stream-transcoder": "0.0.5",
-    "symbolsjs": "maboiteaspam/symbolsjs",
-    "vid-streamer": "^1.0.0-alpha2"
+    "symbolsjs": "^1.0.0",
+    "vid-streamer": "~1.0.0-alpha2"
   },
   "devDependencies": {
-    "request": "^2.49.0",
-    "zombie": "^2.5.1"
+    "request": "~2.49.0",
+    "zombie": "~2.5.1"
   },
   "scripts": {
     "test": "mocha --globals s --reporter spec",
