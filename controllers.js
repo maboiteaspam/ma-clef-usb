@@ -13,6 +13,19 @@ var url = require('url');
 
 var maClefUsb = require('./ma-clef-usb');
 
+/*
+monkey patching
+ */
+Transcoder.prototype.stream = function() {
+  var a = this._compileArguments();
+  a.push('pipe:1');
+  this.child = this._exec(a)
+  this.stream = this.child.stdout
+  return this.stream
+};
+
+var currentStream;
+
 var respondErrorCode = function( code, res ){
   if( code === 'not-found' ){
     res.status(404).send(code)
@@ -238,7 +251,7 @@ var controllers = {
     p = p.replace('/stream','');
     p = p.match(/^[/]/)?p:"/"+p;
     maClefUsb.readmeta(p,function(meta){
-      if( !respondErrorCode(meta,res) ){
+      if( !respondErrorCode(meta, res) ){
         if(meta.contentType.match(/webm|ogg|mp4$/)){
           vidStreamer.settings({
             "mode": "development",
@@ -250,22 +263,27 @@ var controllers = {
           });
           vidStreamer(req,res);
         }else{
+          if (currentStream) {
+            currentStream.kill('SIGHUP');
+          }
           try{
-            new Transcoder(maClefUsb.getHome()+"/"+p)
-              .maxSize(320, 240)
-              .videoCodec('h264')
-              .videoBitrate(800 * 1000)
-              .fps(25)
-              .sampleRate(44100)
-              .channels(2)
-              .audioBitrate(128 * 1000)
+            res.status(206)
+            var transcoder = new Transcoder(maClefUsb.getHome()+"/"+p);
+            transcoder
+              .videoCodec('libx264')
+              .audioCodec('mp3')
               .format('mp4')
+              .on('error', function(e) {
+                console.error(e)
+              })
               .on('finish', function() {
                 next();
               })
-              .stream().pipe(res);
+              .stream()
+              .pipe(res);
+            currentStream = transcoder.child;
           }catch(ex){
-            respondErrorCode('not-found',res);
+            respondErrorCode('not-found', res);
           }
         }
       }
